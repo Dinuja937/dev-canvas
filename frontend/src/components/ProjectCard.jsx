@@ -1,0 +1,1 @@
+// Card component used in the project feed
