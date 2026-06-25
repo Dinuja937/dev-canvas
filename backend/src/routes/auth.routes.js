@@ -1,7 +1,8 @@
 // Google OAuth routes
 import express from 'express'
 import passport from 'passport'
-import authMiddleware from '../middleware/auth.middleware'
+import authMiddleware from '../middleware/auth.middleware.js'
+import { handleGoogleCallback, selectRole, getMe } from '../controllers/auth.controller.js'
 
 
 const router = express.Router()

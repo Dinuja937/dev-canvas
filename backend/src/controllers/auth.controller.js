@@ -1,6 +1,6 @@
 // OAuth callback and JWT issue logic
 import jwt from 'jsonwebtoken'
-import User from '../models/User'
+import User from '../models/User.js'
 
 export const handleGoogleCallback = (req, res) => {
 
@@ -18,11 +18,6 @@ export const handleGoogleCallback = (req, res) => {
         { expiresIn: '7d' }
 
     )
-
-    if (user.isNewUser) {
-        //role selection page
-        return res.redirect(`${process.env.CLIENT_URL}/select-role?token=${token}`)
-    }
 
     res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`)
 }

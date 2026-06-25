@@ -5,6 +5,7 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import 'dotenv/config'
 import passport from './config/passport.js'
+import authRoutes from './routes/auth.routes.js'
 
 const app = express()
 
