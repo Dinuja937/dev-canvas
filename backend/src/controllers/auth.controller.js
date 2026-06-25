@@ -1,1 +1,68 @@
 // OAuth callback and JWT issue logic
+import jwt from 'jsonwebtoken'
+import User from '../models/User'
+
+export const handleGoogleCallback = (req, res) => {
+
+    const user = req.user
+
+    const token = jwt.sign(
+        {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            isNewUser: user.isNewUser,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+
+    )
+
+    if (user.isNewUser) {
+        //role selection page
+        return res.redirect(`${process.env.CLIENT_URL}/select-role?token=${token}`)
+    }
+
+    res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`)
+}
+
+export const selectRole = async (req, res, next) => {
+    try {
+        const { role } = req.body
+
+        if (!['STUDENT', 'RECRUITER'].includes(role)) {
+            return res.status(400).json({ success: false, message: 'Invalid role' })
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { role, isNewUser: false },
+            { new: true }
+        )
+
+        // issue a fresh token with updated role
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                isNewUser: false,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        )
+
+        res.json({ success: true, token, user })
+    } catch (err) {
+        next(err)
+    }
+}
+
+
+export const getMe = (req, res) => {
+    res.json({ success: true, user: req.user })
+}
+
+

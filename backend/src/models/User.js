@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['STUDENT', 'RECRUITER', 'ADMIN'],
     default: 'STUDENT'
+  },
+  isNewUser: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true
