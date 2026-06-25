@@ -103,7 +103,7 @@ const SelectRolePage = () => {
         <button 
           onClick={handleSubmit} 
           disabled={submitting} 
-          className={`w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-base font-semibold shadow-lg shadow-purple-500/25 transition-all focus:outline-none ${
+          className={`w-full py-4 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-base font-semibold shadow-lg shadow-purple-500/25 transition-all focus:outline-none ${
             submitting ? 'opacity-60 cursor-not-allowed' : ''
           }`}
         >

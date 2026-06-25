@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import useAuthStore from './store/authStore';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './routing/ProtectedRoute';
 
 import { authService } from './services/auth.service';
+
+import Layout from './components/Layout';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -33,15 +35,16 @@ function App() {
           } 
         />
 
-        {/* Protected Core Routes */}
-        <Route 
-          path="/" 
+        {/* Protected Core Routes (wrapped in global Layout) */}
+        <Route
           element={
             <ProtectedRoute>
-              <HomePage />
+              <Layout />
             </ProtectedRoute>
-          } 
-        />
+          }
+        >
+          <Route path="/" element={<HomePage />} />
+        </Route>
 
         {/* Catch-all Redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />

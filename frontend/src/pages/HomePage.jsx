@@ -1,60 +1,8 @@
 import React from 'react';
-import useAuthStore from '../store/authStore';
-import { authService } from '../services/auth.service';
 
 const HomePage = () => {
-  const { user } = useAuthStore();
-
   return (
-    <div className="min-h-screen bg-white text-slate-800 font-sans flex flex-col">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 sm:px-12 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🎓</span>
-          <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
-            DevCanvas
-          </span>
-        </div>
-
-        {/* Search bar placeholder */}
-        <div className="hidden md:flex items-center w-full max-w-sm mx-8">
-          <div className="relative w-full">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input 
-              type="text" 
-              placeholder="Search student projects..." 
-              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-sm placeholder-slate-400 text-slate-900 bg-slate-50/50"
-            />
-          </div>
-        </div>
-
-        {/* Profile Area */}
-        <div className="flex items-center gap-4 sm:gap-6">
-          {user && (
-            <div className="flex items-center gap-3">
-              {user.profilePic && (
-                <img 
-                  src={user.profilePic} 
-                  alt={user.name} 
-                  className="w-10 h-10 rounded-full border-2 border-purple-500/30 object-cover"
-                />
-              )}
-              <div className="hidden sm:flex flex-col text-left">
-                <span className="text-sm font-semibold text-slate-800 leading-none">{user.name}</span>
-                <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider mt-1">{user.role}</span>
-              </div>
-            </div>
-          )}
-          <button 
-            onClick={authService.logout} 
-            className="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-all focus:outline-none cursor-pointer"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+    <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
 
       {/* Main content container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-10 flex flex-col gap-10 box-border">
