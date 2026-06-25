@@ -2,151 +2,75 @@ import React from 'react';
 
 const LoginPage = () => {
   const handleGoogleLogin = () => {
-    // Redirect to backend OAuth route
     window.location.href = 'http://localhost:3000/api/auth/google';
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.header}>
-          <div style={styles.logoContainer}>
-            <span style={styles.logoIcon}>🎓</span>
-            <h1 style={styles.logoText}>DevCanvas</h1>
+    <div className="flex h-screen w-screen bg-white font-sans overflow-hidden">
+      {/* Left side - Image Hero (Only visible on large screens) */}
+      <div className="hidden lg:flex lg:w-1/2 p-6 h-full flex-col box-border">
+        <div className="w-full h-full relative rounded-3xl overflow-hidden shadow-lg">
+          {/* Main Hero Photo */}
+          <img
+            src="https://images.unsplash.com/photo-1603201667230-bd139210db18?q=80&w=1188&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Students collaborating"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Dark Gradient Overlay for text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 flex flex-col justify-end p-12">
+            <h2 className="text-white text-5xl font-bold leading-tight mb-4 tracking-tight max-w-lg">
+              Showcase Your Tech with Clarity
+            </h2>
+            <p className="text-slate-200 text-base leading-relaxed max-w-md">
+              DevCanvas helps you showcase your innovations, connect with recruiters, and track computing coursework feedback all in one place.
+            </p>
           </div>
-          <p style={styles.subtitle}>Student Project Showcase Portal</p>
+        </div>
+      </div>
+
+      {/* Right side - Login Form */}
+      <div className="w-full lg:w-1/2 h-full flex flex-col justify-between items-center p-8 sm:p-12 md:p-16 box-border">
+        {/* Empty placeholder for alignment */}
+        <div className="hidden lg:block h-8"></div>
+
+        <div className="w-full max-w-md flex flex-col my-auto">
+          {/* Top Logo */}
+          <div className="flex items-center gap-2.5 mb-8 justify-center lg:justify-start">
+
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
+              DevCanvas
+            </span>
+          </div>
+
+          {/* Form Header */}
+          <div className="text-center lg:text-left mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Welcome to DevCanvas</h1>
+            <p className="text-slate-500 text-sm">Please sign in to access your student workspace</p>
+          </div>
+
+          {/* Google Login Action Only */}
+          <div className="w-full">
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full py-4 px-6 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold flex items-center justify-center gap-3 transition-all focus:outline-none cursor-pointer text-base"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" className="w-5 h-5" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+              </svg>
+              Sign in with Google
+            </button>
+          </div>
         </div>
 
-        <div style={styles.body}>
-          <p style={styles.description}>
-            Showcase your hard work, connect with recruiters, and discover incredible projects built by peers.
+        {/* Footer */}
+        <div className="w-full text-center">
+          <p className="text-slate-400 text-xs">
+            Faculty of Computing &copy; 2026. Need assistance? <a href="#" className="text-purple-600 font-semibold hover:underline">Contact your admin.</a>
           </p>
-
-          <button onClick={handleGoogleLogin} style={styles.googleButton}>
-            <svg style={styles.googleIcon} viewBox="0 0 24 24">
-              <path
-                fill="#EA4335"
-                d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582l3.51-3.51C17.742 1.055 14.914 0 12 0 7.354 0 3.307 2.67 1.304 6.605l3.962 3.16z"
-              />
-              <path
-                fill="#4285F4"
-                d="M16.04 15.345c-1.077.733-2.502 1.182-4.04 1.182a7.07 7.07 0 0 1-6.734-4.856l-3.962 3.16C3.307 21.33 7.354 24 12 24c4.682 0 8.7-2.618 10.745-6.436l-3.99-3.091-2.715.872z"
-              />
-              <path
-                fill="#34A853"
-                d="M22.745 17.564c-.08-.182-2.715-5.218-10.745-5.218a7.09 7.09 0 0 0-6.734 4.856l3.962 3.16A4.908 4.908 0 0 1 12 16.909c2.473 0 4.195 1.527 4.195 1.527l3.99 3.091c.08-.182 1.836-3.218 2.56-4.963z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M23.491 12.273c0-.818-.073-1.609-.209-2.382H12v4.564h6.491a5.54 5.54 0 0 1-2.4 3.655l3.99 3.091c2.327-2.145 3.673-5.3 3.673-8.927z"
-              />
-            </svg>
-            Sign in with Google
-          </button>
-        </div>
-
-        <div style={styles.footer}>
-          <p style={styles.footerText}>Faculty of Computing &copy; 2026</p>
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    background: 'radial-gradient(circle at 10% 20%, #1e1e24 0%, #0d0d11 90%)',
-    fontFamily: "'Outfit', 'Inter', sans-serif",
-    padding: '20px',
-  },
-  card: {
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(16px)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '24px',
-    padding: '40px',
-    maxWidth: '420px',
-    width: '100%',
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  header: {
-    marginBottom: '32px',
-  },
-  logoContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '12px',
-    marginBottom: '8px',
-  },
-  logoIcon: {
-    fontSize: '32px',
-  },
-  logoText: {
-    fontSize: '28px',
-    fontWeight: '700',
-    background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    margin: 0,
-    letterSpacing: '-0.5px',
-  },
-  subtitle: {
-    color: '#94a3b8',
-    fontSize: '14px',
-    margin: 0,
-    fontWeight: '500',
-    letterSpacing: '0.5px',
-    textTransform: 'uppercase',
-  },
-  body: {
-    width: '100%',
-    marginBottom: '32px',
-  },
-  description: {
-    color: '#cbd5e1',
-    fontSize: '15px',
-    lineHeight: '1.6',
-    marginBottom: '32px',
-  },
-  googleButton: {
-    width: '100%',
-    padding: '14px 20px',
-    borderRadius: '12px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    background: '#ffffff',
-    color: '#0f172a',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '12px',
-    transition: 'all 0.2s ease',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-    outline: 'none',
-  },
-  googleIcon: {
-    width: '20px',
-    height: '20px',
-  },
-  footer: {
-    marginTop: 'auto',
-  },
-  footerText: {
-    color: '#64748b',
-    fontSize: '12px',
-    margin: 0,
-  },
 };
 
 export default LoginPage;

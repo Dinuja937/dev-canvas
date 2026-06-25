@@ -6,7 +6,7 @@ import { authService } from '../services/auth.service';
 const SelectRolePage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { setToken, user } = useAuthStore();
+  const { setToken } = useAuthStore();
   const [selectedRole, setSelectedRole] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -36,160 +36,82 @@ const SelectRolePage = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Choose Your Account Type</h1>
-        <p style={styles.subtitle}>Welcome to DevCanvas! Are you showcases projects or looking to hire?</p>
-        
-        {errorMsg && <div style={styles.error}>{errorMsg}</div>}
+    <div className="flex justify-center items-center min-h-screen bg-slate-50 font-sans p-6">
+      <div className="bg-white border border-slate-100 rounded-3xl p-8 sm:p-12 max-w-2xl w-full shadow-xl shadow-slate-100/50 flex flex-col items-center text-center">
+        {/* Top Icon / Header */}
+        <div className="flex items-center gap-2 mb-6">
+          <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
+            DevCanvas
+          </span>
+        </div>
 
-        <div style={styles.options}>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
+          Choose Your Path
+        </h1>
+        <p className="text-slate-500 text-sm sm:text-base mb-10 max-w-md leading-relaxed">
+          Welcome! To personalize your portal experience, please select your primary account role below.
+        </p>
+        
+        {errorMsg && (
+          <div className="bg-red-50 text-red-600 border border-red-100 rounded-xl p-4 mb-6 text-sm w-full text-left">
+            {errorMsg}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full mb-10">
+          {/* Student option */}
           <div 
             onClick={() => setSelectedRole('STUDENT')}
-            style={{
-              ...styles.optionCard,
-              ...(selectedRole === 'STUDENT' ? styles.optionCardSelected : {})
-            }}
+            className={`border rounded-2xl p-6 sm:p-8 cursor-pointer transition-all text-center flex flex-col items-center group hover:bg-slate-50/50 ${
+              selectedRole === 'STUDENT' 
+                ? 'bg-purple-50/30 border-purple-500 shadow-lg shadow-purple-500/10' 
+                : 'border-slate-200'
+            }`}
           >
-            <div style={styles.icon}>👨‍💻</div>
-            <h3 style={styles.optionTitle}>Student / Creator</h3>
-            <p style={styles.optionDescription}>Showcase your amazing projects, build your portfolio, and get discovered by recruiters.</p>
+            <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 mb-5 group-hover:scale-110 transition-transform duration-200">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <h3 className="text-slate-900 text-lg font-bold mb-2">Student Creator</h3>
+            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
+              Publish your portfolio projects, receive reviews, and get discovered by employers.
+            </p>
           </div>
 
+          {/* Recruiter option */}
           <div 
             onClick={() => setSelectedRole('RECRUITER')}
-            style={{
-              ...styles.optionCard,
-              ...(selectedRole === 'RECRUITER' ? styles.optionCardSelected : {})
-            }}
+            className={`border rounded-2xl p-6 sm:p-8 cursor-pointer transition-all text-center flex flex-col items-center group hover:bg-slate-50/50 ${
+              selectedRole === 'RECRUITER' 
+                ? 'bg-purple-50/30 border-purple-500 shadow-lg shadow-purple-500/10' 
+                : 'border-slate-200'
+            }`}
           >
-            <div style={styles.icon}>🔍</div>
-            <h3 style={styles.optionTitle}>Recruiter / Reviewer</h3>
-            <p style={styles.optionDescription}>Browse innovative student projects, like your favorites, and follow top talent.</p>
+            <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 mb-5 group-hover:scale-110 transition-transform duration-200">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <h3 className="text-slate-900 text-lg font-bold mb-2">Recruiter / Employer</h3>
+            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
+              Search top talent projects, follow creators, and save your favorite project highlights.
+            </p>
           </div>
         </div>
 
         <button 
           onClick={handleSubmit} 
           disabled={submitting} 
-          style={{
-            ...styles.submitBtn,
-            ...(submitting ? styles.submitBtnDisabled : {})
-          }}
+          className={`w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-base font-semibold shadow-lg shadow-purple-500/25 transition-all focus:outline-none ${
+            submitting ? 'opacity-60 cursor-not-allowed' : ''
+          }`}
         >
-          {submitting ? 'Setting up account...' : 'Continue to Dashboard'}
+          {submitting ? 'Setting up your profile...' : 'Continue to DevCanvas'}
         </button>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    background: 'radial-gradient(circle at 10% 20%, #1e1e24 0%, #0d0d11 90%)',
-    fontFamily: "'Outfit', 'Inter', sans-serif",
-    padding: '20px',
-  },
-  card: {
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(16px)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '24px',
-    padding: '40px',
-    maxWidth: '750px',
-    width: '100%',
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  title: {
-    fontSize: '32px',
-    fontWeight: '700',
-    background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    margin: '0 0 12px 0',
-  },
-  subtitle: {
-    color: '#94a3b8',
-    fontSize: '16px',
-    marginBottom: '32px',
-    maxWidth: '500px',
-    lineHeight: '1.5',
-  },
-  error: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    color: '#ef4444',
-    border: '1px solid rgba(239, 68, 68, 0.2)',
-    borderRadius: '8px',
-    padding: '12px',
-    marginBottom: '24px',
-    fontSize: '14px',
-    width: '100%',
-    boxSizing: 'border-box',
-  },
-  options: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-    gap: '24px',
-    width: '100%',
-    marginBottom: '36px',
-  },
-  optionCard: {
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid rgba(255, 255, 255, 0.06)',
-    borderRadius: '16px',
-    padding: '30px',
-    cursor: 'pointer',
-    transition: 'all 0.25s ease',
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  optionCardSelected: {
-    background: 'rgba(99, 102, 241, 0.08)',
-    border: '2px solid #6366f1',
-    boxShadow: '0 0 20px rgba(99, 102, 241, 0.25)',
-  },
-  icon: {
-    fontSize: '44px',
-    marginBottom: '16px',
-  },
-  optionTitle: {
-    color: '#f8fafc',
-    fontSize: '20px',
-    fontWeight: '600',
-    margin: '0 0 10px 0',
-  },
-  optionDescription: {
-    color: '#94a3b8',
-    fontSize: '14px',
-    lineHeight: '1.6',
-    margin: 0,
-  },
-  submitBtn: {
-    padding: '14px 40px',
-    borderRadius: '12px',
-    background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-    color: '#ffffff',
-    fontSize: '16px',
-    fontWeight: '600',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'opacity 0.2s',
-    boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)',
-  },
-  submitBtnDisabled: {
-    opacity: 0.6,
-    cursor: 'not-allowed',
-  },
 };
 
 export default SelectRolePage;
