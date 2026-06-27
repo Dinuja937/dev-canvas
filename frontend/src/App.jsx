@@ -12,8 +12,6 @@ import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import SelectRolePage from './pages/SelectRolePage';
 import HomePage from './pages/HomePage';
-import CreateProjectPage from './pages/CreateProjectPage';
-import EditProjectPage from './pages/EditProjectPage';
 
 function App() {
   useEffect(() => {
@@ -46,8 +44,6 @@ function App() {
           }
         >
           <Route path="/" element={<HomePage />} />
-          <Route path="/upload" element={<CreateProjectPage />} />
-          <Route path="/edit/:id" element={<EditProjectPage />} />
         </Route>
 
         {/* Catch-all Redirect */}
