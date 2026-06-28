@@ -1,5 +1,6 @@
 // Admin dashboard to manage users and projects
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAllUsers, getAllProjects } from '../api/admin.api';
 
 const AdminPage = () => {
     const [users, setUsers] = useState([]);
@@ -8,11 +9,41 @@ const AdminPage = () => {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('Users'); // 'Users' | 'Projects'
 
+    // Fetch data whenever activeTab changes (or on mount)
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                if (activeTab === 'Users') {
+                    const res = await getAllUsers();
+                    setUsers(res.data.data);
+                } else {
+                    const res = await getAllProjects();
+                    setProjects(res.data.data);
+                }
+            } catch (err) {
+                setError(err?.response?.data?.message || 'Failed to load data. Please try again.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [activeTab]);
+
+    const formatDate = (dateStr) =>
+        new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+    const roleColors = {
+        ADMIN: 'bg-red-50 text-red-600',
+        STUDENT: 'bg-purple-50 text-purple-600',
+        RECRUITER: 'bg-blue-50 text-blue-600',
+    };
+
     return (
         <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
-
-            {/* Main content container */}
-            <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-10 flex flex-col gap-10 box-border">
+            <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-10 flex flex-col gap-8 box-border">
 
                 {/* Page Header */}
                 <section className="flex items-center gap-4 border-b border-slate-100 pb-6">
@@ -28,11 +59,10 @@ const AdminPage = () => {
                 </section>
 
                 {/* Stats Row */}
-                <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {[
-                        { label: 'Total Users', value: '—', icon: '👥' },
-                        { label: 'Total Projects', value: '—', icon: '📁' },
-                        { label: 'Actions Today', value: '—', icon: '⚡' },
+                        { label: 'Total Users', value: users.length || '—', icon: '👥' },
+                        { label: 'Total Projects', value: projects.length || '—', icon: '📁' },
                     ].map((stat) => (
                         <div key={stat.label} className="rounded-2xl border border-slate-100 bg-slate-50/60 px-6 py-5 flex items-center gap-4">
                             <span className="text-2xl">{stat.icon}</span>
@@ -44,31 +74,116 @@ const AdminPage = () => {
                     ))}
                 </section>
 
-                {/* Users Section */}
-                <section className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Registered Users</h2>
-                    </div>
+                {/* Tab Switcher */}
+                <div className="flex gap-2 border-b border-slate-100 pb-0">
+                    {['Users', 'Projects'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all cursor-pointer focus:outline-none ${activeTab === tab
+                                    ? 'border-purple-600 text-purple-700 bg-purple-50/50'
+                                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
 
-                    {/* Users Table Placeholder */}
-                    <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-                        <span className="text-3xl mb-3">👥</span>
-                        <p className="text-slate-400 text-sm">No users loaded yet</p>
+                {/* Error Banner */}
+                {error && (
+                    <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium">
+                        <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                        {error}
                     </div>
-                </section>
+                )}
 
-                {/* Projects Section */}
-                <section className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                {/* Loading Spinner */}
+                {isLoading && (
+                    <div className="flex justify-center items-center py-20">
+                        <div className="w-10 h-10 rounded-full border-4 border-slate-100 border-l-purple-600 animate-spin" />
+                    </div>
+                )}
+
+                {/* ── USERS TAB ── */}
+                {!isLoading && activeTab === 'Users' && (
+                    <section className="flex flex-col gap-4">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                                Registered Users
+                                {users.length > 0 && (
+                                    <span className="ml-2 text-sm font-medium text-slate-400">({users.length})</span>
+                                )}
+                            </h2>
+                        </div>
+
+                        {users.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
+                                <span className="text-3xl mb-3">👥</span>
+                                <p className="text-slate-400 text-sm">No users found</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-hidden rounded-2xl border border-slate-100 shadow-sm">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                                            <th className="px-5 py-3.5">User</th>
+                                            <th className="px-5 py-3.5">Email</th>
+                                            <th className="px-5 py-3.5">Role</th>
+                                            <th className="px-5 py-3.5">Joined</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50">
+                                        {users.map((user) => (
+                                            <tr key={user._id} className="hover:bg-slate-50/60 transition-colors">
+                                                {/* Avatar + Name */}
+                                                <td className="px-5 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        {user.profilePic ? (
+                                                            <img
+                                                                src={user.profilePic}
+                                                                alt={user.name}
+                                                                className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                                {user.name?.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                        <span className="font-semibold text-slate-800">{user.name}</span>
+                                                    </div>
+                                                </td>
+                                                {/* Email */}
+                                                <td className="px-5 py-4 text-slate-500">{user.email}</td>
+                                                {/* Role Badge */}
+                                                <td className="px-5 py-4">
+                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${roleColors[user.role] || 'bg-slate-100 text-slate-500'}`}>
+                                                        {user.role}
+                                                    </span>
+                                                </td>
+                                                {/* Date */}
+                                                <td className="px-5 py-4 text-slate-400">{formatDate(user.createdAt)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                {/* ── PROJECTS TAB placeholder (to be implemented next) ── */}
+                {!isLoading && activeTab === 'Projects' && (
+                    <section className="flex flex-col gap-4">
                         <h2 className="text-lg font-bold text-slate-900 tracking-tight">Project Submissions</h2>
-                    </div>
-
-                    {/* Projects Table Placeholder */}
-                    <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-                        <span className="text-3xl mb-3">📁</span>
-                        <p className="text-slate-400 text-sm">No projects loaded yet</p>
-                    </div>
-                </section>
+                        <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
+                            <span className="text-3xl mb-3">📁</span>
+                            <p className="text-slate-400 text-sm">No projects loaded yet</p>
+                        </div>
+                    </section>
+                )}
 
             </main>
         </div>
