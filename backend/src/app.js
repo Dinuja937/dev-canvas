@@ -5,6 +5,7 @@ import morgan from "morgan";
 import "dotenv/config";
 import passport from "./config/passport.js";
 import authRoutes from "./routes/auth.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 import "./events/listners.js"; // register all event listeners
 
 const app = express();
@@ -20,6 +21,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
