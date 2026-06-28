@@ -1,6 +1,6 @@
 // Admin dashboard to manage users and projects
 import React, { useState, useEffect } from 'react';
-import { getAllUsers, getAllProjects } from '../api/admin.api';
+import { getAllUsers, getAllProjects, deleteProject } from '../api/admin.api';
 
 const AdminPage = () => {
     const [users, setUsers] = useState([]);
@@ -39,6 +39,16 @@ const AdminPage = () => {
         ADMIN: 'bg-red-50 text-red-600',
         STUDENT: 'bg-purple-50 text-purple-600',
         RECRUITER: 'bg-blue-50 text-blue-600',
+    };
+
+    const handleDeleteProject = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) return;
+        try {
+            await deleteProject(id);
+            setProjects((prev) => prev.filter((p) => p._id !== id));
+        } catch (err) {
+            alert(err?.response?.data?.message || 'Failed to delete project.');
+        }
     };
 
     return (
@@ -81,8 +91,8 @@ const AdminPage = () => {
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all cursor-pointer focus:outline-none ${activeTab === tab
-                                    ? 'border-purple-600 text-purple-700 bg-purple-50/50'
-                                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                ? 'border-purple-600 text-purple-700 bg-purple-50/50'
+                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                                 }`}
                         >
                             {tab}
@@ -174,14 +184,78 @@ const AdminPage = () => {
                     </section>
                 )}
 
-                {/* ── PROJECTS TAB placeholder (to be implemented next) ── */}
+                {/* ── PROJECTS TAB ── */}
                 {!isLoading && activeTab === 'Projects' && (
                     <section className="flex flex-col gap-4">
-                        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Project Submissions</h2>
-                        <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-                            <span className="text-3xl mb-3">📁</span>
-                            <p className="text-slate-400 text-sm">No projects loaded yet</p>
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                                Project Submissions
+                                {projects.length > 0 && (
+                                    <span className="ml-2 text-sm font-medium text-slate-400">({projects.length})</span>
+                                )}
+                            </h2>
                         </div>
+
+                        {projects.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
+                                <span className="text-3xl mb-3">📁</span>
+                                <p className="text-slate-400 text-sm">No projects found</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {projects.map((project) => (
+                                    <div
+                                        key={project._id}
+                                        className="flex flex-col rounded-2xl border border-slate-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                                    >
+                                        {/* Cover Image */}
+                                        {project.coverImage && (
+                                            <img
+                                                src={project.coverImage}
+                                                alt={project.title}
+                                                className="w-full h-36 object-cover"
+                                            />
+                                        )}
+
+                                        <div className="flex flex-col gap-3 p-4 flex-1">
+                                            {/* Title */}
+                                            <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{project.title}</h3>
+
+                                            {/* Description */}
+                                            <p className="text-slate-500 text-xs leading-relaxed line-clamp-3">{project.description}</p>
+
+                                            {/* Owner + Date */}
+                                            <div className="flex items-center gap-2 mt-auto pt-3 border-t border-slate-50">
+                                                {project.studentId?.profilePic ? (
+                                                    <img
+                                                        src={project.studentId.profilePic}
+                                                        alt={project.studentId.name}
+                                                        className="w-6 h-6 rounded-full object-cover border border-slate-200 shrink-0"
+                                                    />
+                                                ) : (
+                                                    <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                                        {project.studentId?.name?.charAt(0).toUpperCase()}
+                                                    </div>
+                                                )}
+                                                <span className="text-xs text-slate-500 font-medium truncate">{project.studentId?.name || 'Unknown'}</span>
+                                                <span className="ml-auto text-[11px] text-slate-400 shrink-0">{formatDate(project.createdAt)}</span>
+                                            </div>
+
+                                            {/* Delete Button */}
+                                            <button
+                                                onClick={() => handleDeleteProject(project._id)}
+                                                className="mt-2 w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-colors cursor-pointer focus:outline-none"
+                                            >
+                                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Delete Project
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </section>
                 )}
 
