@@ -14,6 +14,7 @@ import SelectRolePage from './pages/SelectRolePage';
 import HomePage from './pages/HomePage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import EditProjectPage from './pages/EditProjectPage';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   useEffect(() => {
@@ -28,13 +29,13 @@ function App() {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
         {/* Protected Onboarding Route */}
-        <Route 
-          path="/select-role" 
+        <Route
+          path="/select-role"
           element={
             <ProtectedRoute>
               <SelectRolePage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Protected Core Routes (wrapped in global Layout) */}
@@ -48,6 +49,14 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/upload" element={<CreateProjectPage />} />
           <Route path="/edit/:id" element={<EditProjectPage />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Catch-all Redirect */}
