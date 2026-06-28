@@ -1,5 +1,6 @@
 // CRUD routes for projects
 import express from 'express';
+import multer from 'multer';
 import {
   createProject,
   getProjects,
@@ -8,6 +9,13 @@ import {
   deleteProject,
 } from '../controllers/project.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+const projectUpload = upload.fields([
+  { name: 'coverImage', maxCount: 1 },
+  { name: 'extraImages', maxCount: 10 },
+]);
 
 const router = express.Router();
 
