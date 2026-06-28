@@ -1,8 +1,8 @@
-const eventBus = require("./eventBus");
-const {
+import eventBus from './eventBus.js';
+import {
   createProjectNotification,
   createLikeNotification,
-} = require("../services/notification.service");
+} from '../services/notification.service.js';
 
 eventBus.on("project:created", async ({ project, creator }) => {
   await createProjectNotification(project, creator);
