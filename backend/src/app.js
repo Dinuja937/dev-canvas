@@ -6,6 +6,7 @@ import morgan from 'morgan'
 import 'dotenv/config'
 import passport from './config/passport.js'
 import authRoutes from './routes/auth.routes.js'
+import adminRoutes from './routes/admin.routes.js'
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.get('/api/health', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/admin', adminRoutes)
 
 app.use((err, req, res, next) => {
     console.error(err.stack)
