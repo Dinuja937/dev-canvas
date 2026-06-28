@@ -1,7 +1,13 @@
 // Admin dashboard to manage users and projects
-import React from 'react';
+import React, { useState } from 'react';
 
 const AdminPage = () => {
+    const [users, setUsers] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState('Users'); // 'Users' | 'Projects'
+
     return (
         <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
 
