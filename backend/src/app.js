@@ -5,8 +5,7 @@ import morgan from "morgan";
 import "dotenv/config";
 import passport from "./config/passport.js";
 import authRoutes from "./routes/auth.routes.js";
-
-require("./events/listeners"); // register all event listeners
+import "./events/listners.js"; // register all event listeners
 
 const app = express();
 
