@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import app from './app.js'
 import connectDB from './lib/db.js'
+import './lib/cloudinary.js' 
 
 const PORT = process.env.PORT || 3000
 
