@@ -1,6 +1,6 @@
 // Create, read, update, delete project logic
-import { Project } from '../models/project.model.js';
-import { eventBus } from '../lib/eventBus.js';
+import Project from '../models/Project.js';
+import { eventBus } from '../events/eventBus.js';
 import cloudinary from '../lib/cloudinary.js'; 
 
 // Helper: upload a file buffer to Cloudinary

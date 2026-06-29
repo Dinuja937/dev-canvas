@@ -19,10 +19,10 @@ const projectUpload = upload.fields([
 
 const router = express.Router();
 
-router.post('/', authMiddleware, createProject);
+router.post('/', authMiddleware, projectUpload, createProject);
 router.get('/', getProjects);
 router.get('/:id', getProjectById);
-router.put('/:id', authMiddleware, updateProject);
+router.put('/:id', authMiddleware, projectUpload, updateProject);
 router.delete('/:id', authMiddleware, deleteProject);
 
 export default router;
