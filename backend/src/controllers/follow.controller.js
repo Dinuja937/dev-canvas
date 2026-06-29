@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Follower from '../models/Follower.js';
 import User from '../models/User.js';
+import eventBus from '../events/eventBus.js';
 
 const getAuthenticatedUserId = (req) => req.user.id || req.user._id;
 
@@ -38,6 +39,9 @@ export const toggleFollow = async (req, res, next) => {
     }
 
     await Follower.create({ followerId, followingId });
+
+    // Emit event for notification
+    eventBus.emit("user:followed", { followerId, followingId });
 
     return res.status(201).json({ success: true, following: true });
   } catch (err) {
