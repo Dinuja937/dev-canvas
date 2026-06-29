@@ -504,7 +504,7 @@ const AdminPage = () => {
                             <div className="bg-white/80 rounded-2xl border border-slate-100/80 overflow-x-auto shadow-[0_4px_24px_rgba(0,0,0,0.02)] backdrop-blur-3xl pb-2 mt-2">
                                 <table className="w-full text-left text-sm whitespace-nowrap">
                                     <thead>
-                                        <tr className="border-b border-slate-100 bg-slate-100/50 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+                                        <tr className="border-b border-slate-100 bg-slate-100/50 text-slate-500 font-bold uppercase tracking-wider text-[12px]">
                                             <th className="px-6 py-4">User</th>
                                             <th className="px-6 py-4">Email</th>
                                             <th className="px-6 py-4">Role</th>
@@ -514,59 +514,97 @@ const AdminPage = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50/80">
-                                        {users.map((user) => (
-                                            <tr key={user._id} className="hover:bg-slate-50/80 transition-all hover:shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative z-0 hover:z-10 group">
+                                        {users.map((user, idx) => (
+                                            <tr key={user._id} className="hover:bg-purple-50/30 transition-all duration-200 relative z-0 hover:z-10 group"
+                                                style={{ animation: 'tabFadeIn 0.35s ease both', animationDelay: `${idx * 0.04}s` }}>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="relative">
                                                             {user.profilePic ? (
                                                                 <img src={user.profilePic} alt={user.name}
-                                                                    className={`w-9 h-9 rounded-full object-cover shadow-sm ring-2 ring-white shrink-0 ${user.isDisabled ? 'grayscale opacity-50' : ''}`} />
+                                                                    className={`w-10 h-10 rounded-full object-cover shadow-sm shrink-0 ${user.isDisabled ? 'grayscale opacity-50 ring-2 ring-slate-200' : 'ring-2 ring-purple-200'}`} />
                                                             ) : (
-                                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-sm ring-2 ring-white ${user.isDisabled ? 'bg-slate-100 text-slate-400' : 'bg-gradient-to-br from-purple-100 to-fuchsia-100 text-purple-600'}`}>
+                                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-sm ${user.isDisabled ? 'bg-slate-100 text-slate-400 ring-2 ring-slate-200' : 'bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white ring-2 ring-purple-200'}`}>
                                                                     {user.name?.charAt(0).toUpperCase()}
                                                                 </div>
                                                             )}
+
                                                         </div>
-                                                        <span className={`font-extrabold tracking-tight ${user.isDisabled ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{user.name}</span>
+                                                        <div className="flex flex-col">
+                                                            <span className={`font-extrabold tracking-tight ${user.isDisabled ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{user.name}</span>
+                                                            <span className="text-[10px] text-slate-400 font-medium mt-0.5">ID: {user._id?.slice(-6).toUpperCase()}</span>
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td className={`px-6 py-4 font-medium tracking-tight ${user.isDisabled ? 'text-slate-400' : 'text-slate-500'}`}>{user.email}</td>
-                                                <td className="px-6 py-4 flex justify-center">
-                                                    <span className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest border ${user.isDisabled ? 'border-slate-100 bg-slate-50 text-slate-400' : (user.role === 'ADMIN' ? 'border-red-100 bg-red-50 text-red-600' : user.role === 'STUDENT' ? 'border-purple-100 bg-purple-50 text-purple-600' : 'border-blue-100 bg-blue-50 text-blue-600')}`}>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border ${user.isDisabled ? 'border-slate-100 bg-slate-50 text-slate-400' : (user.role === 'ADMIN' ? 'border-red-100 bg-red-50 text-red-600' : user.role === 'STUDENT' ? 'border-purple-100 bg-purple-50 text-purple-600' : 'border-blue-100 bg-blue-50 text-blue-600')}`}>
+                                                        {!user.isDisabled && user.role === 'ADMIN' && (
+                                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                                                            </svg>
+                                                        )}
+                                                        {!user.isDisabled && user.role === 'STUDENT' && (
+                                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+                                                            </svg>
+                                                        )}
+                                                        {!user.isDisabled && user.role === 'RECRUITER' && (
+                                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                            </svg>
+                                                        )}
                                                         {user.role}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {user.isDisabled ? (
-                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-red-50 text-red-600 border border-red-100">
+                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-50 text-red-600 border border-red-100">
                                                             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Disabled
                                                         </div>
                                                     ) : (
-                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
                                                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
                                                         </div>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 text-slate-400 font-medium tracking-tight">{formatDate(user.createdAt)}</td>
+                                                <td className="px-6 py-4 text-slate-400 font-medium tracking-tight">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                                        </svg>
+                                                        {formatDate(user.createdAt)}
+                                                    </div>
+                                                </td>
                                                 <td className="px-6 py-4 flex justify-center items-center h-full min-h-[52px]">
                                                     {user._id !== adminUser?.id && user._id !== adminUser?._id ? (
                                                         <button
                                                             onClick={() => setUserToggleTarget(user)}
-                                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer focus:outline-none ${user.isDisabled
-                                                                ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                                                                : 'bg-red-50 text-red-600 hover:bg-red-100'
+                                                            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer focus:outline-none ${user.isDisabled
+                                                                ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:shadow-sm'
+                                                                : 'bg-red-50 text-red-600 hover:bg-red-100 hover:shadow-sm'
                                                                 }`}
                                                         >
+                                                            {user.isDisabled ? (
+                                                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                            ) : (
+                                                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                                                </svg>
+                                                            )}
                                                             {user.isDisabled ? 'Enable' : 'Disable'}
                                                         </button>
                                                     ) : (
                                                         <div
-                                                            className="flex items-center justify-center h-[30px] w-[50px] rounded-lg bg-slate-50 border border-slate-100 text-slate-300 font-bold select-none"
-                                                            style={{ boxShadow: 'inset 0 2px 4px rgba(248,250,252,1)' }}
+                                                            className="inline-flex items-center gap-1 h-[30px] px-3 rounded-lg bg-slate-50 border border-slate-100 text-slate-300 text-xs font-bold select-none"
                                                             title="Current User"
                                                         >
-                                                            —
+                                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                            </svg>
+                                                            You
                                                         </div>
                                                     )}
                                                 </td>
@@ -581,61 +619,78 @@ const AdminPage = () => {
 
                 {/* ── PROJECTS TAB ── */}
                 {!isLoading && activeTab === 'Projects' && (
-                    <section key="projects" className="flex flex-col gap-4" style={{ animation: 'tabFadeIn 0.3s ease both' }}>
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                    <section key="projects" className="flex flex-col gap-6 relative" style={{ animation: 'tabFadeIn 0.4s ease both' }}>
+                        <div className="flex flex-col gap-1.5 mb-2 px-1">
+                            <h2 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight flex items-center gap-3">
                                 Project Submissions
                                 {projects.length > 0 && (
-                                    <span className="ml-2 text-sm font-medium text-slate-400">({projects.length})</span>
+                                    <span className="inline-flex items-center justify-center px-3.5 py-1 bg-purple-50 text-purple-700 text-sm font-bold rounded-full border border-purple-100 shadow-sm">
+                                        {projects.length}
+                                    </span>
                                 )}
                             </h2>
+                            <p className="text-sm font-medium text-slate-500">Manage, moderate, and review all active project submissions across the platform.</p>
                         </div>
 
                         {projects.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-                                <span className="text-3xl mb-3">📁</span>
-                                <p className="text-slate-400 text-sm">No projects found</p>
+                            <div className="flex flex-col items-center justify-center py-20 px-4 border-2 border-dashed border-slate-200/80 rounded-[32px] bg-slate-50/50 backdrop-blur-sm">
+                                <div className="w-20 h-20 rounded-full bg-slate-100/80 flex items-center justify-center mb-5 shadow-inner">
+                                    <span className="text-4xl grayscale opacity-60">📁</span>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-700 mb-1.5">No Projects Found</h3>
+                                <p className="text-slate-400 text-sm text-center max-w-sm font-medium">There are no project submissions available at the moment. New projects will appear here.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {projects.map((project) => (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {projects.map((project, idx) => (
                                     <div
                                         key={project._id}
-                                        className="flex flex-col rounded-3xl border border-slate-100 bg-white/70 backdrop-blur-lg shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 overflow-hidden group relative"
+                                        className="flex flex-col rounded-[24px] border border-slate-200/60 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_-12px_rgba(124,58,237,0.15)] hover:border-purple-200/80 hover:-translate-y-1.5 transition-all duration-500 overflow-hidden group relative"
+                                        style={{ animation: 'tabFadeIn 0.5s ease both', animationDelay: `${idx * 0.06}s` }}
                                     >
-                                        {project.coverImage && (
-                                            <div className="w-full h-40 overflow-hidden relative">
+                                        {/* Cover Image */}
+                                        <div className="w-full h-48 overflow-hidden relative bg-slate-100">
+                                            {project.coverImage ? (
                                                 <img src={project.coverImage} alt={project.title}
                                                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                            </div>
-                                        )}
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200">
+                                                    <svg className="w-12 h-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
 
-                                        <div className="flex flex-col gap-3 p-4 flex-1">
-                                            <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{project.title}</h3>
-                                            <p className="text-slate-500 text-xs leading-relaxed line-clamp-3">{project.description}</p>
+                                        {/* Project Info */}
+                                        <div className="flex flex-col p-5 flex-1 relative bg-white/40">
+                                            <h3 className="font-extrabold text-slate-900 text-lg leading-tight line-clamp-2 group-hover:text-purple-700 transition-colors mb-2 pr-2">{project.title}</h3>
+                                            <p className="text-slate-500 text-sm leading-relaxed line-clamp-2 mb-5 font-medium">{project.description}</p>
 
-                                            <div className="flex items-center gap-2 mt-auto pt-3 border-t border-slate-50">
+                                            {/* Footer Info */}
+                                            <div className="flex items-center gap-3 mt-auto pt-4 border-t border-slate-200/70">
                                                 {project.studentId?.profilePic ? (
                                                     <img src={project.studentId.profilePic} alt={project.studentId.name}
-                                                        className="w-6 h-6 rounded-full object-cover border border-slate-200 shrink-0" />
+                                                        className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow-sm shrink-0" />
                                                 ) : (
-                                                    <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center font-bold text-sm ring-2 ring-white shadow-sm shrink-0">
                                                         {project.studentId?.name?.charAt(0).toUpperCase()}
                                                     </div>
                                                 )}
-                                                <span className="text-xs text-slate-500 font-medium truncate">{project.studentId?.name || 'Unknown'}</span>
-                                                <span className="ml-auto text-[11px] text-slate-400 shrink-0">{formatDate(project.createdAt)}</span>
+                                                <div className="flex flex-col overflow-hidden">
+                                                    <span className="text-sm font-extrabold text-slate-800 truncate tracking-tight">{project.studentId?.name || 'Unknown User'}</span>
+                                                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{project.studentId?.role || 'Student'}</span>
+                                                </div>
+                                                <span className="ml-auto text-[11px] font-bold text-slate-400 shrink-0 bg-slate-100/80 px-2.5 py-1 rounded-md">{formatDate(project.createdAt)}</span>
                                             </div>
 
-                                            {/* Delete Button */}
+                                            {/* Delete Project Action */}
                                             <button
                                                 onClick={() => setModalTarget({ id: project._id, title: project.title })}
-                                                className="mt-2 w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-colors cursor-pointer focus:outline-none"
+                                                className="mt-4 w-full flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-red-50/50 hover:bg-red-50 text-red-600 text-[13px] font-bold transition-all focus:outline-none border border-transparent hover:border-red-100"
                                             >
-                                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                                 Delete Project
                                             </button>
