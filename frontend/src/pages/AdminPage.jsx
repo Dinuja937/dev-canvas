@@ -2,14 +2,207 @@
 import React, { useState, useEffect } from 'react';
 import { getAllUsers, getAllProjects, deleteProject } from '../api/admin.api';
 
+/* ─── Delete Confirmation Modal ──────────────────────────────────── */
+const DeleteModal = ({ projectTitle, onConfirm, onCancel, isDeleting }) => (
+    <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ backdropFilter: 'blur(10px)', backgroundColor: 'rgba(8,12,30,0.65)' }}
+    >
+        <div
+            className="relative w-full max-w-md rounded-3xl overflow-hidden"
+            style={{
+                animation: 'modalPop 0.28s cubic-bezier(.34,1.56,.64,1) both',
+                background: 'linear-gradient(135deg,#ffffff 0%,#fff5f5 100%)',
+                boxShadow: '0 32px 80px -12px rgba(220,38,38,0.25), 0 0 0 1px rgba(220,38,38,0.08)',
+            }}
+        >
+            {/* Top gradient band */}
+            <div style={{ background: 'linear-gradient(90deg,#ef4444,#f43f5e,#ec4899)', height: 4 }} />
+
+            {/* Decorative blurred circles */}
+            <div style={{
+                position: 'absolute', top: -40, right: -40,
+                width: 180, height: 180, borderRadius: '50%',
+                background: 'radial-gradient(circle,rgba(239,68,68,0.12),transparent 70%)',
+                pointerEvents: 'none',
+            }} />
+            <div style={{
+                position: 'absolute', bottom: -30, left: -30,
+                width: 140, height: 140, borderRadius: '50%',
+                background: 'radial-gradient(circle,rgba(244,63,94,0.10),transparent 70%)',
+                pointerEvents: 'none',
+            }} />
+
+            <div className="relative p-8 flex flex-col items-center text-center gap-6">
+
+                {/* Animated pulse icon */}
+                <div className="relative flex items-center justify-center">
+                    <span className="absolute inline-flex w-20 h-20 rounded-full opacity-20"
+                        style={{ background: '#ef4444', animation: 'ping 1.6s cubic-bezier(0,0,0.2,1) infinite' }} />
+                    <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center"
+                        style={{
+                            background: 'linear-gradient(135deg,#fee2e2,#fecdd3)',
+                            boxShadow: '0 8px 24px rgba(239,68,68,0.22)',
+                        }}>
+                        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none"
+                            stroke="url(#trashGrad)" strokeWidth={1.8}>
+                            <defs>
+                                <linearGradient id="trashGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stopColor="#ef4444" />
+                                    <stop offset="100%" stopColor="#f43f5e" />
+                                </linearGradient>
+                            </defs>
+                            <path strokeLinecap="round" strokeLinejoin="round"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                </div>
+
+                {/* Heading */}
+                <div className="flex flex-col gap-2">
+                    <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+                        Delete this project?
+                    </h2>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                        You're about to permanently remove
+                    </p>
+                    <div style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        background: 'linear-gradient(90deg,#fef2f2,#fff0f3)',
+                        border: '1px solid #fecaca', borderRadius: 10,
+                        padding: '8px 14px', margin: '0 auto',
+                    }}>
+                        <svg className="w-3.5 h-3.5 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: '#b91c1c', maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {projectTitle}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Consequence checklist */}
+                <div style={{
+                    width: '100%', background: '#fafafa',
+                    border: '1px solid #f1f5f9', borderRadius: 14, padding: '14px 16px',
+                    display: 'flex', flexDirection: 'column', gap: 10,
+                }}>
+                    {[
+                        'Project details & description',
+                        'All associated media & files',
+                        'Submission record from the system',
+                    ].map((item) => (
+                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div style={{
+                                width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                                background: 'linear-gradient(135deg,#ef4444,#f43f5e)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <span style={{ fontSize: 12.5, color: '#475569', fontWeight: 500 }}>{item}</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Warning badge */}
+                <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    background: 'linear-gradient(90deg,#fff1f2,#fdf2f8)',
+                    border: '1px solid #fecdd3', borderRadius: 999,
+                    padding: '6px 14px', fontSize: 11.5, fontWeight: 700,
+                    color: '#be123c', letterSpacing: '0.02em',
+                }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round"
+                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    This action is irreversible and cannot be undone
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 w-full">
+                    <button
+                        onClick={onCancel}
+                        disabled={isDeleting}
+                        style={{
+                            flex: 1, padding: '11px 0', borderRadius: 14,
+                            border: '1.5px solid #e2e8f0', background: '#fff',
+                            fontSize: 13.5, fontWeight: 700, color: '#64748b',
+                            cursor: 'pointer', transition: 'all 0.18s',
+                        }}
+                        onMouseEnter={e => { e.target.style.background = '#f8fafc'; e.target.style.borderColor = '#cbd5e1'; }}
+                        onMouseLeave={e => { e.target.style.background = '#fff'; e.target.style.borderColor = '#e2e8f0'; }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={isDeleting}
+                        style={{
+                            flex: 1, padding: '11px 0', borderRadius: 14, border: 'none',
+                            background: isDeleting
+                                ? 'linear-gradient(135deg,#fca5a5,#fda4af)'
+                                : 'linear-gradient(135deg,#ef4444 0%,#f43f5e 60%,#ec4899 100%)',
+                            fontSize: 13.5, fontWeight: 700, color: '#fff',
+                            cursor: isDeleting ? 'not-allowed' : 'pointer',
+                            boxShadow: '0 4px 18px rgba(239,68,68,0.35)',
+                            transition: 'all 0.18s',
+                            opacity: isDeleting ? 0.75 : 1,
+                        }}
+                    >
+                        {isDeleting ? (
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                                <svg style={{ width: 15, height: 15, animation: 'spin 0.8s linear infinite' }}
+                                    viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round"
+                                        d="M12 3v3m0 12v3m9-9h-3M6 12H3" />
+                                </svg>
+                                Deleting…
+                            </span>
+                        ) : (
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Yes, Delete Project
+                            </span>
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <style>{`
+            @keyframes modalPop {
+                from { opacity:0; transform:scale(0.82) translateY(24px); }
+                to   { opacity:1; transform:scale(1)   translateY(0); }
+            }
+            @keyframes ping {
+                75%,100% { transform:scale(1.8); opacity:0; }
+            }
+            @keyframes spin {
+                to { transform:rotate(360deg); }
+            }
+        `}</style>
+    </div>
+);
+
+/* ─── Main AdminPage ─────────────────────────────────────────────── */
 const AdminPage = () => {
     const [users, setUsers] = useState([]);
     const [projects, setProjects] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [activeTab, setActiveTab] = useState('Users'); // 'Users' | 'Projects'
+    const [activeTab, setActiveTab] = useState('Users');
 
-    // Fetch data whenever activeTab changes (or on mount)
+    // Modal state
+    const [modalTarget, setModalTarget] = useState(null); // { id, title }
+    const [isDeleting, setIsDeleting] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
@@ -28,7 +221,6 @@ const AdminPage = () => {
                 setIsLoading(false);
             }
         };
-
         fetchData();
     }, [activeTab]);
 
@@ -41,18 +233,34 @@ const AdminPage = () => {
         RECRUITER: 'bg-blue-50 text-blue-600',
     };
 
-    const handleDeleteProject = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) return;
+    const confirmDelete = async () => {
+        if (!modalTarget) return;
+        setIsDeleting(true);
         try {
-            await deleteProject(id);
-            setProjects((prev) => prev.filter((p) => p._id !== id));
+            await deleteProject(modalTarget.id);
+            setProjects((prev) => prev.filter((p) => p._id !== modalTarget.id));
+            setModalTarget(null);
         } catch (err) {
-            alert(err?.response?.data?.message || 'Failed to delete project.');
+            setError(err?.response?.data?.message || 'Failed to delete project.');
+            setModalTarget(null);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     return (
         <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
+
+            {/* ── Delete Confirmation Modal ── */}
+            {modalTarget && (
+                <DeleteModal
+                    projectTitle={modalTarget.title}
+                    onConfirm={confirmDelete}
+                    onCancel={() => setModalTarget(null)}
+                    isDeleting={isDeleting}
+                />
+            )}
+
             <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-10 flex flex-col gap-8 box-border">
 
                 {/* Page Header */}
@@ -148,15 +356,11 @@ const AdminPage = () => {
                                     <tbody className="divide-y divide-slate-50">
                                         {users.map((user) => (
                                             <tr key={user._id} className="hover:bg-slate-50/60 transition-colors">
-                                                {/* Avatar + Name */}
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center gap-3">
                                                         {user.profilePic ? (
-                                                            <img
-                                                                src={user.profilePic}
-                                                                alt={user.name}
-                                                                className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
-                                                            />
+                                                            <img src={user.profilePic} alt={user.name}
+                                                                className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0" />
                                                         ) : (
                                                             <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs shrink-0">
                                                                 {user.name?.charAt(0).toUpperCase()}
@@ -165,15 +369,12 @@ const AdminPage = () => {
                                                         <span className="font-semibold text-slate-800">{user.name}</span>
                                                     </div>
                                                 </td>
-                                                {/* Email */}
                                                 <td className="px-5 py-4 text-slate-500">{user.email}</td>
-                                                {/* Role Badge */}
                                                 <td className="px-5 py-4">
                                                     <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${roleColors[user.role] || 'bg-slate-100 text-slate-500'}`}>
                                                         {user.role}
                                                     </span>
                                                 </td>
-                                                {/* Date */}
                                                 <td className="px-5 py-4 text-slate-400">{formatDate(user.createdAt)}</td>
                                             </tr>
                                         ))}
@@ -208,30 +409,19 @@ const AdminPage = () => {
                                         key={project._id}
                                         className="flex flex-col rounded-2xl border border-slate-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                                     >
-                                        {/* Cover Image */}
                                         {project.coverImage && (
-                                            <img
-                                                src={project.coverImage}
-                                                alt={project.title}
-                                                className="w-full h-36 object-cover"
-                                            />
+                                            <img src={project.coverImage} alt={project.title}
+                                                className="w-full h-36 object-cover" />
                                         )}
 
                                         <div className="flex flex-col gap-3 p-4 flex-1">
-                                            {/* Title */}
                                             <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{project.title}</h3>
-
-                                            {/* Description */}
                                             <p className="text-slate-500 text-xs leading-relaxed line-clamp-3">{project.description}</p>
 
-                                            {/* Owner + Date */}
                                             <div className="flex items-center gap-2 mt-auto pt-3 border-t border-slate-50">
                                                 {project.studentId?.profilePic ? (
-                                                    <img
-                                                        src={project.studentId.profilePic}
-                                                        alt={project.studentId.name}
-                                                        className="w-6 h-6 rounded-full object-cover border border-slate-200 shrink-0"
-                                                    />
+                                                    <img src={project.studentId.profilePic} alt={project.studentId.name}
+                                                        className="w-6 h-6 rounded-full object-cover border border-slate-200 shrink-0" />
                                                 ) : (
                                                     <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-[10px] shrink-0">
                                                         {project.studentId?.name?.charAt(0).toUpperCase()}
@@ -243,11 +433,12 @@ const AdminPage = () => {
 
                                             {/* Delete Button */}
                                             <button
-                                                onClick={() => handleDeleteProject(project._id)}
+                                                onClick={() => setModalTarget({ id: project._id, title: project.title })}
                                                 className="mt-2 w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-colors cursor-pointer focus:outline-none"
                                             >
                                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                                 Delete Project
                                             </button>
