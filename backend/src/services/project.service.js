@@ -1,0 +1,121 @@
+import Project from '../models/Project.js';
+import eventBus from '../events/eventBus.js';
+import cloudinary from '../lib/cloudinary.js';
+
+export const uploadToCloudinary = async (buffer, folder) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { folder, resource_type: 'image' },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result.secure_url);
+            }
+        );
+        stream.end(buffer);
+    });
+};
+
+export const createProject = async (projectData, files, user) => {
+    let coverImageUrl = '';
+    let extraImageUrls = [];
+
+    if (files?.coverImage?.[0]) {
+        coverImageUrl = await uploadToCloudinary(
+            files.coverImage[0].buffer,
+            'dev-canvas/projects'
+        );
+    }
+
+    if (files?.extraImages?.length) {
+        extraImageUrls = await Promise.all(
+            files.extraImages.map((file) =>
+                uploadToCloudinary(file.buffer, 'dev-canvas/projects/extras')
+            )
+        );
+    }
+
+    let tagsArray = [];
+    if (projectData.tags) {
+        tagsArray = typeof projectData.tags === 'string'
+            ? projectData.tags.split(',').map((t) => t.trim()).filter(Boolean)
+            : projectData.tags;
+    }
+
+    const project = new Project({
+        title: projectData.title,
+        description: projectData.description,
+        githubUrl: projectData.githubUrl,
+        demoUrl: projectData.demoUrl,
+        tags: tagsArray,
+        studentId: user.id,
+        coverImage: coverImageUrl,
+        extraImages: extraImageUrls,
+    });
+
+    await project.save();
+
+    eventBus.emit("project:created", {
+        project,
+        creator: user,
+    });
+
+    return project;
+};
+
+export const getProjects = async (userId) => {
+    const query = {};
+    if (userId) {
+        query.studentId = userId;
+    }
+    return await Project.find(query).populate('studentId', 'name email profilePic');
+};
+
+export const getProjectById = async (projectId) => {
+    const project = await Project.findById(projectId).populate('studentId', 'name email profilePic');
+    if (!project) throw new Error('Project not found');
+    return project;
+};
+
+export const updateProject = async (projectId, updateData, files, userId) => {
+    const project = await Project.findById(projectId);
+    if (!project) throw new Error('Project not found');
+    if (project.studentId.toString() !== userId) throw new Error('Unauthorized');
+
+    if (files?.coverImage?.[0]) {
+        project.coverImage = await uploadToCloudinary(
+            files.coverImage[0].buffer,
+            'dev-canvas/projects'
+        );
+    }
+
+    if (files?.extraImages?.length) {
+        project.extraImages = await Promise.all(
+            files.extraImages.map((file) =>
+                uploadToCloudinary(file.buffer, 'dev-canvas/projects/extras')
+            )
+        );
+    }
+
+    const { title, description, githubUrl, demoUrl, tags } = updateData;
+    if (title) project.title = title;
+    if (description) project.description = description;
+    if (githubUrl !== undefined) project.githubUrl = githubUrl;
+    if (demoUrl !== undefined) project.demoUrl = demoUrl;
+    if (tags !== undefined) {
+        project.tags = typeof tags === 'string'
+            ? tags.split(',').map((t) => t.trim()).filter(Boolean)
+            : tags;
+    }
+
+    await project.save();
+    return project;
+};
+
+export const deleteProject = async (projectId, userId) => {
+    const project = await Project.findById(projectId);
+    if (!project) throw new Error('Project not found');
+    if (project.studentId.toString() !== userId) throw new Error('Unauthorized');
+
+    await project.deleteOne();
+    return { message: 'Project deleted' };
+};

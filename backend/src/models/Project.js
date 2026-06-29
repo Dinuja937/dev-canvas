@@ -16,6 +16,15 @@ const projectSchema = new mongoose.Schema({
   images: [{
     type: String
   }],
+  githubUrl: {
+    type: String
+  },
+  demoUrl: {
+    type: String
+  },
+  tags: [{
+    type: String
+  }],
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

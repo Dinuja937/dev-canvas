@@ -8,7 +8,7 @@ import {
   updateProject,
   deleteProject,
 } from '../controllers/project.controller.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import authMiddleware from '../middleware/auth.middleware.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
