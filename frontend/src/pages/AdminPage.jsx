@@ -4,6 +4,115 @@ import { useSearchParams } from 'react-router-dom';
 import { getAllUsers, getAllProjects, deleteProject, toggleUserStatus } from '../api/admin.api';
 import useAuthStore from '../store/authStore';
 
+/* ─── Toggle User Modal ──────────────────────────────────────────── */
+const UserToggleModal = ({ user, onConfirm, onCancel, isToggling }) => {
+    const isDisabling = !user.isDisabled;
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backdropFilter: 'blur(10px)', backgroundColor: 'rgba(8,12,30,0.65)' }}
+        >
+            <div
+                className="relative w-full max-w-md rounded-3xl overflow-hidden"
+                style={{
+                    animation: 'modalPop 0.28s cubic-bezier(.34,1.56,.64,1) both',
+                    background: 'linear-gradient(135deg,#ffffff 0%,#f8fafc 100%)',
+                    boxShadow: isDisabling
+                        ? '0 32px 80px -12px rgba(220,38,38,0.25), 0 0 0 1px rgba(220,38,38,0.08)'
+                        : '0 32px 80px -12px rgba(16,185,129,0.25), 0 0 0 1px rgba(16,185,129,0.08)',
+                }}
+            >
+                {/* Top gradient band */}
+                <div style={{ background: isDisabling ? 'linear-gradient(90deg,#ef4444,#f43f5e,#ec4899)' : 'linear-gradient(90deg,#10b981,#34d399,#6ee7b7)', height: 4 }} />
+
+                <div className="relative p-8 flex flex-col items-center text-center gap-6">
+
+                    {/* Animated pulse icon */}
+                    <div className="relative flex items-center justify-center">
+                        <span className="absolute inline-flex w-20 h-20 rounded-full opacity-20"
+                            style={{
+                                background: isDisabling ? '#ef4444' : '#10b981',
+                                animation: 'ping 1.6s cubic-bezier(0,0,0.2,1) infinite'
+                            }}
+                        />
+                        <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center"
+                            style={{
+                                background: isDisabling ? 'linear-gradient(135deg,#fee2e2,#fecdd3)' : 'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+                                boxShadow: isDisabling ? '0 8px 24px rgba(239,68,68,0.22)' : '0 8px 24px rgba(16,185,129,0.22)',
+                            }}>
+                            {isDisabling ? (
+                                <svg className="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                </svg>
+                            ) : (
+                                <svg className="w-8 h-8 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Heading */}
+                    <div className="flex flex-col gap-2">
+                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+                            {isDisabling ? 'Disable User?' : 'Enable User?'}
+                        </h2>
+                        <p className="text-slate-500 text-sm leading-relaxed">
+                            {isDisabling ? "You're about to suspend access for" : "You're about to restore access for"}
+                        </p>
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            background: isDisabling ? 'linear-gradient(90deg,#fef2f2,#fff0f3)' : 'linear-gradient(90deg,#f0fdf4,#ecfdf5)',
+                            border: isDisabling ? '1px solid #fecaca' : '1px solid #a7f3d0', borderRadius: 10,
+                            padding: '8px 14px', margin: '0 auto',
+                        }}>
+                            <span style={{ fontWeight: 700, fontSize: 13, color: isDisabling ? '#b91c1c' : '#047857', maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {user.name} ({user.email})
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 w-full">
+                        <button
+                            onClick={onCancel}
+                            disabled={isToggling}
+                            style={{
+                                flex: 1, padding: '11px 0', borderRadius: 14,
+                                border: '1.5px solid #e2e8f0', background: '#fff',
+                                fontSize: 13.5, fontWeight: 700, color: '#64748b',
+                                cursor: 'pointer', transition: 'all 0.18s',
+                            }}
+                            onMouseEnter={e => { e.target.style.background = '#f8fafc'; e.target.style.borderColor = '#cbd5e1'; }}
+                            onMouseLeave={e => { e.target.style.background = '#fff'; e.target.style.borderColor = '#e2e8f0'; }}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            disabled={isToggling}
+                            style={{
+                                flex: 1, padding: '11px 0', borderRadius: 14, border: 'none',
+                                background: isToggling
+                                    ? (isDisabling ? '#fca5a5' : '#6ee7b7')
+                                    : (isDisabling ? 'linear-gradient(135deg,#ef4444 0%,#f43f5e 60%,#ec4899 100%)' : 'linear-gradient(135deg,#10b981 0%,#34d399 100%)'),
+                                fontSize: 13.5, fontWeight: 700, color: '#fff',
+                                cursor: isToggling ? 'not-allowed' : 'pointer',
+                                boxShadow: isDisabling ? '0 4px 18px rgba(239,68,68,0.35)' : '0 4px 18px rgba(16,185,129,0.35)',
+                                transition: 'all 0.18s',
+                                opacity: isToggling ? 0.75 : 1,
+                            }}
+                        >
+                            {isToggling ? 'Processing…' : (isDisabling ? 'Yes, Disable' : 'Yes, Enable')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 /* ─── Delete Confirmation Modal ──────────────────────────────────── */
 const DeleteModal = ({ projectTitle, onConfirm, onCancel, isDeleting }) => (
     <div
@@ -213,6 +322,10 @@ const AdminPage = () => {
     const [modalTarget, setModalTarget] = useState(null); // { id, title }
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // User Toggle Modal state
+    const [userToggleTarget, setUserToggleTarget] = useState(null);
+    const [isTogglingUser, setIsTogglingUser] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
@@ -258,12 +371,18 @@ const AdminPage = () => {
         }
     };
 
-    const handleToggleUser = async (userId) => {
+    const confirmToggleUser = async () => {
+        if (!userToggleTarget) return;
+        setIsTogglingUser(true);
         try {
-            await toggleUserStatus(userId);
-            setUsers(users.map(u => u._id === userId ? { ...u, isDisabled: !u.isDisabled } : u));
+            await toggleUserStatus(userToggleTarget._id);
+            setUsers(users.map(u => u._id === userToggleTarget._id ? { ...u, isDisabled: !u.isDisabled } : u));
+            setUserToggleTarget(null);
         } catch (err) {
             setError(err?.response?.data?.message || 'Failed to toggle user status');
+            setUserToggleTarget(null);
+        } finally {
+            setIsTogglingUser(false);
         }
     };
 
@@ -277,6 +396,16 @@ const AdminPage = () => {
                     onConfirm={confirmDelete}
                     onCancel={() => setModalTarget(null)}
                     isDeleting={isDeleting}
+                />
+            )}
+
+            {/* ── Toggle User Confirmation Modal ── */}
+            {userToggleTarget && (
+                <UserToggleModal
+                    user={userToggleTarget}
+                    onConfirm={confirmToggleUser}
+                    onCancel={() => setUserToggleTarget(null)}
+                    isToggling={isTogglingUser}
                 />
             )}
 
@@ -407,10 +536,10 @@ const AdminPage = () => {
                                                 <td className="px-5 py-4 flex justify-end">
                                                     {user._id !== adminUser?.id && user._id !== adminUser?._id && (
                                                         <button
-                                                            onClick={() => handleToggleUser(user._id)}
+                                                            onClick={() => setUserToggleTarget(user)}
                                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer focus:outline-none ${user.isDisabled
-                                                                    ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                                                                    : 'bg-red-50 text-red-600 hover:bg-red-100'
+                                                                ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                                                : 'bg-red-50 text-red-600 hover:bg-red-100'
                                                                 }`}
                                                         >
                                                             {user.isDisabled ? 'Enable' : 'Disable'}
