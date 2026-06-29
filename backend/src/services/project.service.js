@@ -49,7 +49,7 @@ export const createProject = async (projectData, files, user) => {
         tags: tagsArray,
         studentId: user.id,
         coverImage: coverImageUrl,
-        extraImages: extraImageUrls,
+        images: extraImageUrls,
     });
 
     await project.save();
@@ -89,7 +89,7 @@ export const updateProject = async (projectId, updateData, files, userId) => {
     }
 
     if (files?.extraImages?.length) {
-        project.extraImages = await Promise.all(
+        project.images = await Promise.all(
             files.extraImages.map((file) =>
                 uploadToCloudinary(file.buffer, 'dev-canvas/projects/extras')
             )

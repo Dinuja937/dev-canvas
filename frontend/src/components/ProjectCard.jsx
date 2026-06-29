@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import { toggleLike, getLikeStatus, getLikeCount } from '../api/like.api';
 
@@ -37,6 +38,7 @@ const HeartIcon = ({ filled }) => (
 
 /* ── ProjectCard ───────────────────────────────────────────────── */
 const ProjectCard = ({ project, onLikeChange }) => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const isRecruiter = user?.role === 'RECRUITER';
 
@@ -90,7 +92,10 @@ const ProjectCard = ({ project, onLikeChange }) => {
   const authorInitial = authorName.charAt(0).toUpperCase();
 
   return (
-    <article className="group relative flex flex-col rounded-2xl border border-slate-100 bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_-12px_rgba(124,58,237,0.13)] hover:border-purple-100">
+    <article
+      onClick={() => navigate(`/projects/${project._id}`, { state: { project } })}
+      className="group relative flex flex-col rounded-2xl border border-slate-100 bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_-12px_rgba(124,58,237,0.13)] hover:border-purple-100 cursor-pointer"
+    >
 
       {/* ── Cover image ─────────────────────────────────────── */}
       <div className="relative w-full aspect-[16/9] bg-slate-100 overflow-hidden">
@@ -131,7 +136,7 @@ const ProjectCard = ({ project, onLikeChange }) => {
         )}
 
         {/* Title */}
-        <h3 className="text-base font-extrabold text-slate-900 leading-snug tracking-tight line-clamp-2 group-hover:text-purple-700 transition-colors">
+        <h3 className="text-base font-extrabold text-slate-900 leading-snug tracking-tight line-clamp-2 transition-colors">
           {project.title}
         </h3>
 
@@ -203,10 +208,10 @@ const ProjectCard = ({ project, onLikeChange }) => {
             aria-pressed={liked}
             title={!isRecruiter ? 'Only recruiters can like projects' : liked ? 'Unlike' : 'Like'}
             className={`group relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 select-none focus:outline-none shrink-0 ${liked
-                ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-100'
-                : isRecruiter
-                  ? 'text-slate-400 bg-slate-50 hover:bg-rose-50 hover:text-rose-500 border border-slate-100 hover:border-rose-100'
-                  : 'text-slate-300 bg-slate-50 border border-slate-100 cursor-default'
+              ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-100'
+              : isRecruiter
+                ? 'text-slate-400 bg-slate-50 hover:bg-rose-50 hover:text-rose-500 border border-slate-100 hover:border-rose-100'
+                : 'text-slate-300 bg-slate-50 border border-slate-100 cursor-default'
               } disabled:opacity-60`}
           >
             <span className={`${liked ? 'text-rose-500' : isRecruiter ? 'group-hover:text-rose-400' : 'text-slate-300'} transition-colors`}>
