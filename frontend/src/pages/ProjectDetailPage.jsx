@@ -227,15 +227,15 @@ const ProjectDetailPage = () => {
                 onClick={handleLike}
                 disabled={isLiking || !isRecruiter}
                 title={!isRecruiter ? 'Only recruiters can like projects' : liked ? 'Unlike' : 'Like this project'}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 focus:outline-none border ${
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-base font-bold transition-all duration-200 focus:outline-none border ${
                   liked
                     ? 'text-rose-600 bg-rose-50 border-rose-100 hover:bg-rose-100'
                     : isRecruiter
-                      ? 'text-slate-500 bg-slate-50 border-slate-200 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100'
-                      : 'text-slate-300 bg-slate-50 border-slate-100 cursor-default'
-                } disabled:opacity-60`}
+                      ? 'text-slate-600 bg-slate-50 border-slate-200 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100'
+                      : 'text-slate-600 bg-slate-100 border-slate-300 cursor-default'
+                } disabled:opacity-80`}
               >
-                <span className={liked ? 'text-rose-500' : ''}>
+                <span className={liked ? 'text-rose-500' : 'text-slate-500'}>
                   <HeartIcon filled={liked} />
                 </span>
                 <span>{likeCount} {likeCount === 1 ? 'like' : 'likes'}</span>

@@ -27,7 +27,6 @@ router.get(
 router.get(
   '/:projectId/count',
   authMiddleware,
-  roleMiddleware('RECRUITER'),
   getProjectLikeCount
 );
 
