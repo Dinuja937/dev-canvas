@@ -15,6 +15,7 @@ import HomePage from './pages/HomePage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import EditProjectPage from './pages/EditProjectPage';
 import AdminPage from './pages/AdminPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   useEffect(() => {
@@ -57,6 +58,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
         {/* Catch-all Redirect */}

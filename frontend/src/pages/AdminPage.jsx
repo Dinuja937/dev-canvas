@@ -1,6 +1,8 @@
 // Admin dashboard to manage users and projects
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { getAllUsers, getAllProjects, deleteProject } from '../api/admin.api';
+import useAuthStore from '../store/authStore';
 
 /* ─── Delete Confirmation Modal ──────────────────────────────────── */
 const DeleteModal = ({ projectTitle, onConfirm, onCancel, isDeleting }) => (
@@ -197,11 +199,15 @@ const DeleteModal = ({ projectTitle, onConfirm, onCancel, isDeleting }) => (
 
 /* ─── Main AdminPage ─────────────────────────────────────────────── */
 const AdminPage = () => {
+    const [searchParams] = useSearchParams();
     const [users, setUsers] = useState([]);
     const [projects, setProjects] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [activeTab, setActiveTab] = useState('Users');
+    const validTabs = ['Users', 'Projects', 'Profile'];
+    const initialTab = validTabs.includes(searchParams.get('tab')) ? searchParams.get('tab') : 'Users';
+    const [activeTab, setActiveTab] = useState(initialTab);
+    const { user: adminUser } = useAuthStore();
 
     // Modal state
     const [modalTarget, setModalTarget] = useState(null); // { id, title }
@@ -451,6 +457,130 @@ const AdminPage = () => {
                                 ))}
                             </div>
                         )}
+                    </section>
+                )}
+
+                {/* ── PROFILE TAB ── */}
+                {!isLoading && activeTab === 'Profile' && (
+                    <section key="profile" className="flex flex-col gap-6" style={{ animation: 'tabFadeIn 0.3s ease both' }}>
+
+                        {/* Admin Info Card */}
+                        <div style={{
+                            borderRadius: 20,
+                            background: 'linear-gradient(135deg,#faf5ff 0%,#f5f3ff 100%)',
+                            border: '1px solid #ede9fe',
+                            padding: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 24,
+                            flexWrap: 'wrap',
+                        }}>
+                            {/* Avatar */}
+                            <div style={{ position: 'relative', flexShrink: 0 }}>
+                                {adminUser?.profilePic ? (
+                                    <img
+                                        src={adminUser.profilePic}
+                                        alt={adminUser.name}
+                                        style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', border: '3px solid #7c3aed', boxShadow: '0 8px 24px rgba(124,58,237,0.22)' }}
+                                    />
+                                ) : (
+                                    <div style={{
+                                        width: 88, height: 88, borderRadius: '50%',
+                                        background: 'linear-gradient(135deg,#7c3aed,#a78bfa)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 34, fontWeight: 900, color: '#fff',
+                                        boxShadow: '0 8px 24px rgba(124,58,237,0.25)',
+                                    }}>
+                                        {adminUser?.name?.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+                                {/* Online dot */}
+                                <span style={{
+                                    position: 'absolute', bottom: 4, right: 4,
+                                    width: 14, height: 14, borderRadius: '50%',
+                                    background: '#22c55e', border: '2px solid #fff',
+                                }} />
+                            </div>
+
+                            {/* Info */}
+                            <div style={{ flex: 1, minWidth: 180 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                                    <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.4px' }}>
+                                        {adminUser?.name}
+                                    </h2>
+                                    {/* Role badge */}
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                                        background: 'linear-gradient(90deg,#7c3aed,#a78bfa)',
+                                        color: '#fff', fontSize: 10, fontWeight: 800,
+                                        letterSpacing: '0.08em', textTransform: 'uppercase',
+                                        padding: '3px 10px', borderRadius: 999,
+                                    }}>
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5}>
+                                            <path strokeLinecap="round" strokeLinejoin="round"
+                                                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                                        </svg>
+                                        Admin
+                                    </span>
+                                </div>
+                                <p style={{ color: '#64748b', fontSize: 13.5, marginTop: 4 }}>{adminUser?.email}</p>
+                                {adminUser?.createdAt && (
+                                    <p style={{ color: '#94a3b8', fontSize: 12, marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round"
+                                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                        </svg>
+                                        Member since {new Date(adminUser.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Stats Row */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16 }}>
+                            {[
+                                { label: 'Total Users', value: users.length || '—', icon: '👥', color: '#7c3aed', bg: '#f5f3ff' },
+                                { label: 'Total Projects', value: projects.length || '—', icon: '📁', color: '#0ea5e9', bg: '#f0f9ff' },
+                                { label: 'Your Role', value: 'Admin', icon: '🛡️', color: '#059669', bg: '#f0fdf4' },
+                            ].map((stat) => (
+                                <div key={stat.label} style={{
+                                    borderRadius: 16, border: `1px solid ${stat.bg}`,
+                                    background: stat.bg, padding: '20px 22px',
+                                    display: 'flex', flexDirection: 'column', gap: 8,
+                                }}>
+                                    <span style={{ fontSize: 26 }}>{stat.icon}</span>
+                                    <p style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{stat.label}</p>
+                                    <p style={{ fontSize: 26, fontWeight: 900, color: stat.color, letterSpacing: '-0.5px' }}>{stat.value}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Permissions Card */}
+                        <div style={{ borderRadius: 16, border: '1px solid #f1f5f9', background: '#fafafa', padding: '20px 22px' }}>
+                            <h3 style={{ fontSize: 13, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Admin Permissions</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                {[
+                                    'View all registered users',
+                                    'Browse and manage all project submissions',
+                                    'Delete any project from the system',
+                                    'Full platform oversight & moderation',
+                                ].map((perm) => (
+                                    <div key={perm} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        <div style={{
+                                            width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                                            background: 'linear-gradient(135deg,#7c3aed,#a78bfa)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        }}>
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                            </svg>
+                                        </div>
+                                        <span style={{ fontSize: 13, color: '#475569', fontWeight: 500 }}>{perm}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                     </section>
                 )}
 
