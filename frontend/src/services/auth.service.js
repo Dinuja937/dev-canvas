@@ -1,4 +1,4 @@
-import api from '../api/axios';
+import { getMeAPI, selectRoleAPI, updateProfileAPI } from '../api/auth.api.js';
 import useAuthStore from '../store/authStore';
 
 export const authService = {
@@ -12,7 +12,7 @@ export const authService = {
 
         try {
             useAuthStore.getState().setLoading(true);
-            const response = await api.get('/auth/me');
+            const response = await getMeAPI();
 
             if (response.data?.success) {
                 useAuthStore.getState().setUser(response.data.user);
@@ -32,7 +32,7 @@ export const authService = {
     selectRole: async (role) => {
         try {
             useAuthStore.getState().setLoading(true);
-            const response = await api.patch('/auth/select-role', { role });
+            const response = await selectRoleAPI(role);
 
             if (response.data?.success) {
                 const { token, user } = response.data;
@@ -57,7 +57,7 @@ export const authService = {
     updateProfile: async (name, profilePic) => {
         try {
             useAuthStore.getState().setLoading(true);
-            const response = await api.put('/auth/update-profile', { name, profilePic });
+            const response = await updateProfileAPI(name, profilePic);
 
             if (response.data?.success) {
                 const { token, user } = response.data;
