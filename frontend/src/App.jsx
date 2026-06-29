@@ -16,6 +16,7 @@ import SelectRolePage from './pages/SelectRolePage';
 import HomePage from './pages/HomePage';
 import CreateProjectPage from './pages/CreateProjectPage';
 // import ProjectDetailPage from './pages/ProjectDetailPage';
+import EditProjectPage from './pages/EditProjectPage';
 import ProfilePage from './pages/ProfilePage';
 // import AdminPage from './pages/AdminPage';
 
@@ -60,14 +61,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route
+          <Route
             path="/edit-project/:id"
             element={
               <ProtectedRoute allowedRoles={['STUDENT']}>
                 <EditProjectPage />
               </ProtectedRoute>
             }
-          /> */}
+          />
           {/* <Route path="/projects/:id" element={<ProjectDetailPage />} /> */}
           <Route
             path="/my-portfolio"

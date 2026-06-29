@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import useAuthStore from '../store/authStore';
 import { getProjects } from '../api/project.api';
 import { updateProfile } from '../api/user.api';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const ProfilePage = () => {
@@ -157,12 +158,23 @@ const ProfilePage = () => {
               {projects.map(project => (
                 <div key={project._id} className="flex flex-col sm:flex-row gap-6 items-start pb-10 border-b border-slate-100 last:border-0">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
-                      <span>{new Date(project.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-slate-500 font-medium tracking-wide">
+                        {new Date(project.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </span>
+                      <Link 
+                        to={`/edit-project/${project._id}`} 
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md transition-colors"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        Edit Project
+                      </Link>
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2 leading-tight">
-                      {project.title}
-                    </h3>
+                    <Link to={`/edit-project/${project._id}`} className="hover:underline hover:text-indigo-600 transition-colors inline-block mb-2">
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2 leading-tight">
+                        {project.title}
+                      </h3>
+                    </Link>
                     <p className="text-slate-600 text-base mb-4 line-clamp-3 leading-relaxed">
                       {project.description}
                     </p>
