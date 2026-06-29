@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400,300&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Roboto", sans-serif;
+  --font-sans: "Satoshi", sans-serif;
 }
 
 html, body {
-  font-family: "Roboto", sans-serif;
+  font-family: "Satoshi", sans-serif;
 }
