@@ -500,7 +500,7 @@ const AdminPage = () => {
                                             <th className="px-5 py-3.5">Role</th>
                                             <th className="px-5 py-3.5">Status</th>
                                             <th className="px-5 py-3.5">Joined</th>
-                                            <th className="px-5 py-3.5 text-right">Actions</th>
+                                            <th className="px-5 py-3.5 text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50">
@@ -533,8 +533,8 @@ const AdminPage = () => {
                                                     )}
                                                 </td>
                                                 <td className="px-5 py-4 text-slate-400">{formatDate(user.createdAt)}</td>
-                                                <td className="px-5 py-4 flex justify-end">
-                                                    {user._id !== adminUser?.id && user._id !== adminUser?._id && (
+                                                <td className="px-5 py-4 flex justify-center items-center h-full min-h-[48px]">
+                                                    {user._id !== adminUser?.id && user._id !== adminUser?._id ? (
                                                         <button
                                                             onClick={() => setUserToggleTarget(user)}
                                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer focus:outline-none ${user.isDisabled
@@ -544,6 +544,14 @@ const AdminPage = () => {
                                                         >
                                                             {user.isDisabled ? 'Enable' : 'Disable'}
                                                         </button>
+                                                    ) : (
+                                                        <div
+                                                            className="flex items-center justify-center h-[30px] w-[50px] rounded-lg bg-slate-50 border border-slate-100 text-slate-300 font-bold select-none"
+                                                            style={{ boxShadow: 'inset 0 2px 4px rgba(248,250,252,1)' }}
+                                                            title="Current User"
+                                                        >
+                                                            —
+                                                        </div>
                                                     )}
                                                 </td>
                                             </tr>
