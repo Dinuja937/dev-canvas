@@ -501,49 +501,55 @@ const AdminPage = () => {
                                 <p className="text-slate-400 text-sm">No users found</p>
                             </div>
                         ) : (
-                            <div className="bg-white/80 rounded-2xl border border-slate-100/80 overflow-x-auto shadow-[0_4px_24px_rgba(0,0,0,0.02)] backdrop-blur-3xl pb-2">
+                            <div className="bg-white/80 rounded-2xl border border-slate-100/80 overflow-x-auto shadow-[0_4px_24px_rgba(0,0,0,0.02)] backdrop-blur-3xl pb-2 mt-2">
                                 <table className="w-full text-left text-sm whitespace-nowrap">
                                     <thead>
-                                        <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                                            <th className="px-5 py-3.5">User</th>
-                                            <th className="px-5 py-3.5">Email</th>
-                                            <th className="px-5 py-3.5">Role</th>
-                                            <th className="px-5 py-3.5">Status</th>
-                                            <th className="px-5 py-3.5">Joined</th>
-                                            <th className="px-5 py-3.5 text-center">Actions</th>
+                                        <tr className="border-b border-slate-100 bg-slate-100/50 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+                                            <th className="px-6 py-4">User</th>
+                                            <th className="px-6 py-4">Email</th>
+                                            <th className="px-6 py-4">Role</th>
+                                            <th className="px-6 py-4">Status</th>
+                                            <th className="px-6 py-4">Joined</th>
+                                            <th className="px-6 py-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50/80">
                                         {users.map((user) => (
                                             <tr key={user._id} className="hover:bg-slate-50/80 transition-all hover:shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative z-0 hover:z-10 group">
-                                                <td className="px-5 py-4">
+                                                <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        {user.profilePic ? (
-                                                            <img src={user.profilePic} alt={user.name}
-                                                                className={`w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0 ${user.isDisabled ? 'grayscale opacity-50' : ''}`} />
-                                                        ) : (
-                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${user.isDisabled ? 'bg-slate-100 text-slate-400' : 'bg-purple-100 text-purple-600'}`}>
-                                                                {user.name?.charAt(0).toUpperCase()}
-                                                            </div>
-                                                        )}
-                                                        <span className={`font-semibold ${user.isDisabled ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{user.name}</span>
+                                                        <div className="relative">
+                                                            {user.profilePic ? (
+                                                                <img src={user.profilePic} alt={user.name}
+                                                                    className={`w-9 h-9 rounded-full object-cover shadow-sm ring-2 ring-white shrink-0 ${user.isDisabled ? 'grayscale opacity-50' : ''}`} />
+                                                            ) : (
+                                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-sm ring-2 ring-white ${user.isDisabled ? 'bg-slate-100 text-slate-400' : 'bg-gradient-to-br from-purple-100 to-fuchsia-100 text-purple-600'}`}>
+                                                                    {user.name?.charAt(0).toUpperCase()}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <span className={`font-extrabold tracking-tight ${user.isDisabled ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{user.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className={`px-5 py-4 ${user.isDisabled ? 'text-slate-400' : 'text-slate-500'}`}>{user.email}</td>
-                                                <td className="px-5 py-4">
-                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${roleColors[user.role] || 'bg-slate-100 text-slate-500'} ${user.isDisabled ? 'opacity-50' : ''}`}>
+                                                <td className={`px-6 py-4 font-medium tracking-tight ${user.isDisabled ? 'text-slate-400' : 'text-slate-500'}`}>{user.email}</td>
+                                                <td className="px-6 py-4 flex justify-center">
+                                                    <span className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest border ${user.isDisabled ? 'border-slate-100 bg-slate-50 text-slate-400' : (user.role === 'ADMIN' ? 'border-red-100 bg-red-50 text-red-600' : user.role === 'STUDENT' ? 'border-purple-100 bg-purple-50 text-purple-600' : 'border-blue-100 bg-blue-50 text-blue-600')}`}>
                                                         {user.role}
                                                     </span>
                                                 </td>
-                                                <td className="px-5 py-4">
+                                                <td className="px-6 py-4">
                                                     {user.isDisabled ? (
-                                                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600">Disabled</span>
+                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-red-50 text-red-600 border border-red-100">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Disabled
+                                                        </div>
                                                     ) : (
-                                                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600">Active</span>
+                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                                                        </div>
                                                     )}
                                                 </td>
-                                                <td className="px-5 py-4 text-slate-400">{formatDate(user.createdAt)}</td>
-                                                <td className="px-5 py-4 flex justify-center items-center h-full min-h-[48px]">
+                                                <td className="px-6 py-4 text-slate-400 font-medium tracking-tight">{formatDate(user.createdAt)}</td>
+                                                <td className="px-6 py-4 flex justify-center items-center h-full min-h-[52px]">
                                                     {user._id !== adminUser?.id && user._id !== adminUser?._id ? (
                                                         <button
                                                             onClick={() => setUserToggleTarget(user)}
