@@ -54,6 +54,31 @@ export const authService = {
     },
 
 
+    updateProfile: async (name, profilePic) => {
+        try {
+            useAuthStore.getState().setLoading(true);
+            const response = await api.put('/auth/update-profile', { name, profilePic });
+
+            if (response.data?.success) {
+                const { token, user } = response.data;
+                useAuthStore.getState().setToken(token);
+                useAuthStore.getState().setUser(user);
+                useAuthStore.getState().setLoading(false);
+                return { success: true };
+            }
+
+            useAuthStore.getState().setLoading(false);
+            return { success: false, message: response.data?.message || 'Failed to update profile' };
+        } catch (error) {
+            useAuthStore.getState().setLoading(false);
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Error occurred during profile update'
+            };
+        }
+    },
+
+
     logout: () => {
         useAuthStore.getState().resetAuth();
     }
