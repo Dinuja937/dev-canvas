@@ -485,20 +485,26 @@ const AdminPage = () => {
 
                 {/* ── USERS TAB ── */}
                 {!isLoading && activeTab === 'Users' && (
-                    <section key="users" className="flex flex-col gap-4" style={{ animation: 'tabFadeIn 0.3s ease both' }}>
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                    <section key="users" className="flex flex-col gap-6 relative" style={{ animation: 'tabFadeIn 0.4s ease both' }}>
+                        <div className="flex flex-col gap-1.5 mb-2 px-1">
+                            <h2 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight flex items-center gap-3">
                                 Registered Users
                                 {users.length > 0 && (
-                                    <span className="ml-2 text-sm font-medium text-slate-400">({users.length})</span>
+                                    <span className="inline-flex items-center justify-center px-3.5 py-1 bg-purple-50 text-purple-700 text-sm font-bold rounded-full border border-purple-100 shadow-sm">
+                                        {users.length}
+                                    </span>
                                 )}
                             </h2>
+                            <p className="text-sm font-medium text-slate-500">Manage account access, roles, and status of all platform members.</p>
                         </div>
 
                         {users.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-                                <span className="text-3xl mb-3">👥</span>
-                                <p className="text-slate-400 text-sm">No users found</p>
+                            <div className="flex flex-col items-center justify-center py-20 px-4 border-2 border-dashed border-slate-200/80 rounded-[32px] bg-slate-50/50 backdrop-blur-sm">
+                                <div className="w-20 h-20 rounded-full bg-slate-100/80 flex items-center justify-center mb-5 shadow-inner">
+                                    <span className="text-4xl grayscale opacity-60">👥</span>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-700 mb-1.5">No Users Found</h3>
+                                <p className="text-slate-400 text-sm text-center max-w-sm font-medium">There are no registered users available at the moment. New signups will appear here.</p>
                             </div>
                         ) : (
                             <div className="bg-white/80 rounded-2xl border border-slate-100/80 overflow-x-auto shadow-[0_4px_24px_rgba(0,0,0,0.02)] backdrop-blur-3xl pb-2 mt-2">
