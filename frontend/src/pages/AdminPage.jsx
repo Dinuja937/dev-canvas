@@ -187,6 +187,10 @@ const DeleteModal = ({ projectTitle, onConfirm, onCancel, isDeleting }) => (
             @keyframes spin {
                 to { transform:rotate(360deg); }
             }
+            @keyframes tabFadeIn {
+                from { opacity:0; transform:translateY(12px); }
+                to   { opacity:1; transform:translateY(0); }
+            }
         `}</style>
     </div>
 );
@@ -327,7 +331,7 @@ const AdminPage = () => {
 
                 {/* ── USERS TAB ── */}
                 {!isLoading && activeTab === 'Users' && (
-                    <section className="flex flex-col gap-4">
+                    <section key="users" className="flex flex-col gap-4" style={{ animation: 'tabFadeIn 0.3s ease both' }}>
                         <div className="flex justify-between items-center">
                             <h2 className="text-lg font-bold text-slate-900 tracking-tight">
                                 Registered Users
@@ -387,7 +391,7 @@ const AdminPage = () => {
 
                 {/* ── PROJECTS TAB ── */}
                 {!isLoading && activeTab === 'Projects' && (
-                    <section className="flex flex-col gap-4">
+                    <section key="projects" className="flex flex-col gap-4" style={{ animation: 'tabFadeIn 0.3s ease both' }}>
                         <div className="flex justify-between items-center">
                             <h2 className="text-lg font-bold text-slate-900 tracking-tight">
                                 Project Submissions
