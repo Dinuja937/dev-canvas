@@ -8,6 +8,7 @@ import ProtectedRoute from './routing/ProtectedRoute';
 import { authService } from './services/auth.service';
 
 import Layout from './components/Layout';
+import ScrollToTop from './components/ScrollToTop';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -32,6 +33,7 @@ function App() {
     <>
       <ToastContainer position="bottom-right" autoClose={4000} hideProgressBar={true} theme="colored" />
       <BrowserRouter>
+        <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />

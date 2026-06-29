@@ -11,6 +11,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const dropdownRef = useRef(null);
 
   const navLinks = navigationConfig[user?.role] || [];
@@ -26,6 +27,15 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Handle scroll to add background to navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const activeLinkClass = ({ isActive }) =>
     `relative px-1 py-1 mx-3 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 ${isActive
       ? 'text-slate-900 border-b-2 border-purple-600'
@@ -35,7 +45,11 @@ const Navbar = () => {
   const uploadBtnClass = "px-6 py-2.5 ml-4 bg-slate-900 text-white text-xs font-bold uppercase tracking-[0.1em] rounded-full hover:bg-black transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.15)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] border border-slate-800";
 
   return (
-    <nav className="sticky top-0 z-50 bg-transparent px-6 sm:px-12 py-5 flex justify-between items-center w-full box-border">
+    <nav className={`sticky top-0 z-50 px-6 sm:px-12 flex justify-between items-center w-full box-border transition-all duration-300 ${
+      isScrolled 
+        ? 'py-3 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200' 
+        : 'py-5 bg-transparent border-b border-transparent'
+    }`}>
       {/* Left side - Logo & Name */}
       <NavLink to="/" className="flex items-center gap-3.5 no-underline">
         <div className="grid grid-cols-2 gap-1 w-6 h-6 rotate-45">
