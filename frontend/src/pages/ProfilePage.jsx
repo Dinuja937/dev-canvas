@@ -187,43 +187,113 @@ const ProfilePage = () => {
                     ) : (
                         <form onSubmit={handleSave} className="px-8 pb-8 flex flex-col gap-6" style={{ marginTop: -44 }}>
                             {/* Avatar Picker / Display */}
-                            <div className="flex items-end gap-5">
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                            <div className="flex flex-col sm:flex-row items-center gap-6 bg-slate-50/50 p-5 rounded-2xl border border-slate-100/80">
+                                <div style={{ position: 'relative' }} className="flex-shrink-0 group cursor-pointer" onClick={() => document.getElementById('avatar-file-input').click()}>
                                     {profilePic ? (
                                         <img
                                             src={profilePic}
                                             alt="Preview"
                                             style={{
-                                                width: 88, height: 88, borderRadius: '50%',
+                                                width: 96, height: 96, borderRadius: '50%',
                                                 objectFit: 'cover',
                                                 border: '4px solid #fff',
-                                                boxShadow: '0 8px 24px rgba(124,58,237,0.22)',
+                                                boxShadow: '0 10px 25px -5px rgba(124,58,237,0.3)',
                                             }}
+                                            className="group-hover:scale-105 transition-all duration-300"
                                         />
                                     ) : (
                                         <div style={{
-                                            width: 88, height: 88, borderRadius: '50%',
+                                            width: 96, height: 96, borderRadius: '50%',
                                             background: 'linear-gradient(135deg,#7c3aed,#a78bfa)',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontSize: 34, fontWeight: 900, color: '#fff',
+                                            fontSize: 38, fontWeight: 900, color: '#fff',
                                             border: '4px solid #fff',
-                                            boxShadow: '0 8px 24px rgba(124,58,237,0.25)',
-                                        }}>
+                                            boxShadow: '0 10px 25px -5px rgba(124,58,237,0.3)',
+                                        }} className="group-hover:scale-105 transition-all duration-300">
                                             {name?.charAt(0).toUpperCase() || 'U'}
                                         </div>
                                     )}
+                                    {/* Upload overlay hover effect */}
+                                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-4 border-transparent">
+                                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                                        </svg>
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <label className="block text-xs font-bold text-purple-700 uppercase tracking-widest mb-1.5">
-                                        Profile Image URL
-                                    </label>
-                                    <input
-                                        type="url"
-                                        placeholder="https://example.com/avatar.jpg"
-                                        value={profilePic}
-                                        onChange={(e) => setProfilePic(e.target.value)}
-                                        className="w-full bg-white/70 border border-purple-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all shadow-sm"
-                                    />
+
+                                <div className="flex-1 flex flex-col gap-2 w-full text-center sm:text-left">
+                                    <div className="flex flex-col gap-0.5">
+                                        <label className="block text-xs font-bold text-purple-700 uppercase tracking-widest mb-1.5">
+                                            Profile Photo
+                                        </label>
+                                    </div>
+                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => document.getElementById('avatar-file-input').click()}
+                                            style={{
+                                                background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+                                                border: 'none',
+                                                color: '#fff', fontSize: 13, fontWeight: 700,
+                                                padding: '9px 18px', borderRadius: 12,
+                                                cursor: 'pointer', transition: 'all 0.2s ease',
+                                                boxShadow: '0 4px 14px rgba(109,40,217,0.25)',
+                                                display: 'inline-flex', alignItems: 'center', gap: 6
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(109,40,217,0.35)'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(109,40,217,0.25)'; }}
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                            </svg>
+                                            Choose Local Photo
+                                        </button>
+                                        {profilePic && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setProfilePic('')}
+                                                style={{
+                                                    background: '#fff', border: '1px solid #fecaca',
+                                                    color: '#ef4444', fontSize: 13, fontWeight: 700,
+                                                    padding: '9px 16px', borderRadius: 12,
+                                                    cursor: 'pointer', transition: 'all 0.2s ease',
+                                                    display: 'inline-flex', alignItems: 'center', gap: 6
+                                                }}
+                                                onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.borderColor = '#fca5a5'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#fecaca'; }}
+                                            >
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                                Remove Photo
+                                            </button>
+                                        )}
+                                        <input
+                                            id="avatar-file-input"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setProfilePic(reader.result);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                            className="hidden"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-1.5 justify-center sm:justify-start mt-1 text-slate-400">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="text-slate-400 flex-shrink-0">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.056 1.056L12 12.75M12 9h.008v.008H12V9zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span style={{ fontSize: 11, fontWeight: 500, color: '#64748b' }}>
+                                            Supports JPG, PNG, GIF. Image details are processed in-browser.
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
