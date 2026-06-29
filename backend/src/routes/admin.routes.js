@@ -1,6 +1,6 @@
 // Admin routes
 import express from 'express';
-import { getAllUsers, getAllProjects, deleteProject } from '../controllers/admin.controller.js';
+import { getAllUsers, getAllProjects, deleteProject, toggleUserStatus } from '../controllers/admin.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 import roleMiddleware from '../middleware/role.middleware.js';
 
@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Users route - only ADMIN can access
 router.get('/users', authMiddleware, roleMiddleware('ADMIN'), getAllUsers);
+router.put('/users/:id/toggle-status', authMiddleware, roleMiddleware('ADMIN'), toggleUserStatus);
 
 // Projects route - only ADMIN can access
 router.get('/projects', authMiddleware, roleMiddleware('ADMIN'), getAllProjects);

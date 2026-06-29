@@ -31,4 +31,24 @@ export const deleteProject = async (req, res, next) => {
     }
 };
 
+export const toggleUserStatus = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Prevent admin from disabling themselves
+        if (user._id.toString() === req.user.id.toString()) {
+            return res.status(400).json({ success: false, message: 'Cannot disable your own account' });
+        }
+
+        user.isDisabled = !user.isDisabled;
+        await user.save();
+
+        return res.status(200).json({ success: true, message: `User ${user.isDisabled ? 'disabled' : 'enabled'} successfully`, data: user });
+    } catch (err) {
+        next(err);
+    }
+};
 

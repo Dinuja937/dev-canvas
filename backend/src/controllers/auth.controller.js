@@ -6,6 +6,10 @@ export const handleGoogleCallback = (req, res) => {
 
     const user = req.user
 
+    if (user.isDisabled) {
+        return res.redirect(`${process.env.CLIENT_URL}/login?error=Account suspended. Please contact support.`)
+    }
+
     const token = jwt.sign(
         {
             id: user._id,

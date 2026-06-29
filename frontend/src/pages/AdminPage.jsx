@@ -1,7 +1,7 @@
 // Admin dashboard to manage users and projects
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { getAllUsers, getAllProjects, deleteProject } from '../api/admin.api';
+import { getAllUsers, getAllProjects, deleteProject, toggleUserStatus } from '../api/admin.api';
 import useAuthStore from '../store/authStore';
 
 /* ─── Delete Confirmation Modal ──────────────────────────────────── */
@@ -258,6 +258,15 @@ const AdminPage = () => {
         }
     };
 
+    const handleToggleUser = async (userId) => {
+        try {
+            await toggleUserStatus(userId);
+            setUsers(users.map(u => u._id === userId ? { ...u, isDisabled: !u.isDisabled } : u));
+        } catch (err) {
+            setError(err?.response?.data?.message || 'Failed to toggle user status');
+        }
+    };
+
     return (
         <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
 
@@ -360,7 +369,9 @@ const AdminPage = () => {
                                             <th className="px-5 py-3.5">User</th>
                                             <th className="px-5 py-3.5">Email</th>
                                             <th className="px-5 py-3.5">Role</th>
+                                            <th className="px-5 py-3.5">Status</th>
                                             <th className="px-5 py-3.5">Joined</th>
+                                            <th className="px-5 py-3.5 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50">
@@ -370,22 +381,42 @@ const AdminPage = () => {
                                                     <div className="flex items-center gap-3">
                                                         {user.profilePic ? (
                                                             <img src={user.profilePic} alt={user.name}
-                                                                className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0" />
+                                                                className={`w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0 ${user.isDisabled ? 'grayscale opacity-50' : ''}`} />
                                                         ) : (
-                                                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${user.isDisabled ? 'bg-slate-100 text-slate-400' : 'bg-purple-100 text-purple-600'}`}>
                                                                 {user.name?.charAt(0).toUpperCase()}
                                                             </div>
                                                         )}
-                                                        <span className="font-semibold text-slate-800">{user.name}</span>
+                                                        <span className={`font-semibold ${user.isDisabled ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{user.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-4 text-slate-500">{user.email}</td>
+                                                <td className={`px-5 py-4 ${user.isDisabled ? 'text-slate-400' : 'text-slate-500'}`}>{user.email}</td>
                                                 <td className="px-5 py-4">
-                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${roleColors[user.role] || 'bg-slate-100 text-slate-500'}`}>
+                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${roleColors[user.role] || 'bg-slate-100 text-slate-500'} ${user.isDisabled ? 'opacity-50' : ''}`}>
                                                         {user.role}
                                                     </span>
                                                 </td>
+                                                <td className="px-5 py-4">
+                                                    {user.isDisabled ? (
+                                                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600">Disabled</span>
+                                                    ) : (
+                                                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600">Active</span>
+                                                    )}
+                                                </td>
                                                 <td className="px-5 py-4 text-slate-400">{formatDate(user.createdAt)}</td>
+                                                <td className="px-5 py-4 flex justify-end">
+                                                    {user._id !== adminUser?.id && user._id !== adminUser?._id && (
+                                                        <button
+                                                            onClick={() => handleToggleUser(user._id)}
+                                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer focus:outline-none ${user.isDisabled
+                                                                    ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                                                    : 'bg-red-50 text-red-600 hover:bg-red-100'
+                                                                }`}
+                                                        >
+                                                            {user.isDisabled ? 'Enable' : 'Disable'}
+                                                        </button>
+                                                    )}
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

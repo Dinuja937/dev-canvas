@@ -7,3 +7,5 @@ export const getAllProjects = () => api.get('/admin/projects');
 
 export const deleteProject = (id) => api.delete(`/admin/projects/${id}`);
 
+export const toggleUserStatus = (id) => api.put(`/admin/users/${id}/toggle-status`);
+
