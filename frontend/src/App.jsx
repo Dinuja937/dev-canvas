@@ -19,6 +19,9 @@ import ProjectDetailPage from './pages/ProjectDetailPage';
 import EditProjectPage from './pages/EditProjectPage';
 import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
+import LikedProjectsPage from './pages/LikedProjectsPage';
+import FollowedStudentsPage from './pages/FollowedStudentsPage';
+import StudentPublicProfilePage from './pages/StudentPublicProfilePage';
 
 function App() {
   useEffect(() => {
@@ -80,11 +83,29 @@ function App() {
             }
           />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
+          <Route path="/students/:id" element={<StudentPublicProfilePage />} />
           <Route
             path="/my-portfolio"
             element={
               <ProtectedRoute allowedRoles={['STUDENT']}>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/liked-projects"
+            element={
+              <ProtectedRoute allowedRoles={['RECRUITER']}>
+                <LikedProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/followed-students"
+            element={
+              <ProtectedRoute allowedRoles={['RECRUITER']}>
+                <FollowedStudentsPage />
               </ProtectedRoute>
             }
           />

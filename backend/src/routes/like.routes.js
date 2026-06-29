@@ -5,6 +5,7 @@ import {
   toggleLike,
   getProjectLikeStatus,
   getProjectLikeCount,
+  getLikedProjects,
 } from '../controllers/like.controller.js';
 
 const router = express.Router();
@@ -28,6 +29,13 @@ router.get(
   authMiddleware,
   roleMiddleware('RECRUITER'),
   getProjectLikeCount
+);
+
+router.get(
+  '/my-likes',
+  authMiddleware,
+  roleMiddleware('RECRUITER'),
+  getLikedProjects
 );
 
 export default router;

@@ -11,3 +11,7 @@ export const getLikeStatus = (projectId) => {
 export const getLikeCount = (projectId) => {
   return api.get(`/likes/${projectId}/count`);
 };
+
+export const getLikedProjects = () => {
+  return api.get('/likes/my-likes');
+};

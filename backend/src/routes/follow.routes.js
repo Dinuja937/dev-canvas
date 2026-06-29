@@ -5,6 +5,7 @@ import {
   toggleFollow,
   getFollowStatus,
   getFollowerCount,
+  getFollowingList,
 } from '../controllers/follow.controller.js';
 
 const router = express.Router();
@@ -28,6 +29,13 @@ router.get(
   authMiddleware,
   roleMiddleware('RECRUITER'),
   getFollowerCount
+);
+
+router.get(
+  '/following',
+  authMiddleware,
+  roleMiddleware('RECRUITER'),
+  getFollowingList
 );
 
 export default router;

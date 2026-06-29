@@ -11,3 +11,7 @@ export const getFollowStatus = (userId) => {
 export const getFollowerCount = (userId) => {
   return api.get(`/follows/${userId}/count`);
 };
+
+export const getFollowingList = () => {
+  return api.get('/follows/following');
+};
