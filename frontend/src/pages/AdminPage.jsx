@@ -387,7 +387,13 @@ const AdminPage = () => {
     };
 
     return (
-        <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
+        <div className="flex-1 w-full bg-slate-50 relative overflow-hidden text-slate-800 font-sans flex flex-col">
+
+            {/* Ambient gradients */}
+            <div className="absolute top-0 left-0 w-full h-[400px] overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
+                <div style={{ position: 'absolute', top: -150, left: '10%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)', filter: 'blur(40px)', borderRadius: '50%' }} />
+                <div style={{ position: 'absolute', top: -100, right: '15%', width: 350, height: 350, background: 'radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 70%)', filter: 'blur(40px)', borderRadius: '50%' }} />
+            </div>
 
             {/* ── Delete Confirmation Modal ── */}
             {modalTarget && (
@@ -409,7 +415,7 @@ const AdminPage = () => {
                 />
             )}
 
-            <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-10 flex flex-col gap-8 box-border">
+            <main className="flex-1 relative z-10 max-w-7xl w-full mx-auto px-6 sm:px-12 py-10 flex flex-col gap-8 box-border">
 
                 {/* Page Header */}
                 <section className="flex items-center gap-4 border-b border-slate-100 pb-6">
@@ -425,30 +431,34 @@ const AdminPage = () => {
                 </section>
 
                 {/* Stats Row */}
-                <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <section className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {[
-                        { label: 'Total Users', value: users.length || '—', icon: '👥' },
-                        { label: 'Total Projects', value: projects.length || '—', icon: '📁' },
-                    ].map((stat) => (
-                        <div key={stat.label} className="rounded-2xl border border-slate-100 bg-slate-50/60 px-6 py-5 flex items-center gap-4">
-                            <span className="text-2xl">{stat.icon}</span>
+                        { label: 'Total Users', value: users.length || '—', icon: '👥', gradient: 'from-blue-500 to-indigo-500' },
+                        { label: 'Total Projects', value: projects.length || '—', icon: '📁', gradient: 'from-purple-500 to-pink-500' },
+                    ].map((stat, i) => (
+                        <div key={stat.label} className="relative overflow-hidden rounded-3xl border border-white shadow-[0_8px_30px_rgba(0,0,0,0.04)] bg-white/40 px-6 py-6 flex items-center gap-5 backdrop-blur-xl group hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300" style={{ animation: 'tabFadeIn 0.5s ease both', animationDelay: `${i * 0.1}s` }}>
+                            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.gradient} p-[1px] shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}>
+                                <div className="w-full h-full bg-white/90 backdrop-blur-sm rounded-[15px] flex items-center justify-center text-2xl">
+                                    {stat.icon}
+                                </div>
+                            </div>
                             <div>
-                                <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">{stat.label}</p>
-                                <p className="text-xl font-bold text-slate-900 mt-0.5">{stat.value}</p>
+                                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{stat.label}</p>
+                                <p className="text-3xl font-black text-slate-900 mt-1 tracking-tight">{stat.value}</p>
                             </div>
                         </div>
                     ))}
                 </section>
 
                 {/* Tab Switcher */}
-                <div className="flex gap-2 border-b border-slate-100 pb-0">
+                <div className="flex gap-2 p-1.5 bg-slate-200/50 backdrop-blur-sm border border-slate-200/50 rounded-[14px] w-fit">
                     {['Users', 'Projects'].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all cursor-pointer focus:outline-none ${activeTab === tab
-                                ? 'border-purple-600 text-purple-700 bg-purple-50/50'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                            className={`px-6 py-2 text-sm font-bold rounded-lg transition-all duration-300 cursor-pointer focus:outline-none ${activeTab === tab
+                                ? 'bg-white text-purple-700 shadow-[0_4px_12px_rgba(0,0,0,0.05)]'
+                                : 'bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                                 }`}
                         >
                             {tab}
@@ -491,10 +501,10 @@ const AdminPage = () => {
                                 <p className="text-slate-400 text-sm">No users found</p>
                             </div>
                         ) : (
-                            <div className="overflow-hidden rounded-2xl border border-slate-100 shadow-sm">
-                                <table className="w-full text-sm">
+                            <div className="bg-white/80 rounded-2xl border border-slate-100/80 overflow-x-auto shadow-[0_4px_24px_rgba(0,0,0,0.02)] backdrop-blur-3xl pb-2">
+                                <table className="w-full text-left text-sm whitespace-nowrap">
                                     <thead>
-                                        <tr className="bg-slate-50 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                                        <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
                                             <th className="px-5 py-3.5">User</th>
                                             <th className="px-5 py-3.5">Email</th>
                                             <th className="px-5 py-3.5">Role</th>
@@ -503,9 +513,9 @@ const AdminPage = () => {
                                             <th className="px-5 py-3.5 text-center">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-50">
+                                    <tbody className="divide-y divide-slate-50/80">
                                         {users.map((user) => (
-                                            <tr key={user._id} className="hover:bg-slate-50/60 transition-colors">
+                                            <tr key={user._id} className="hover:bg-slate-50/80 transition-all hover:shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative z-0 hover:z-10 group">
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center gap-3">
                                                         {user.profilePic ? (
@@ -585,11 +595,14 @@ const AdminPage = () => {
                                 {projects.map((project) => (
                                     <div
                                         key={project._id}
-                                        className="flex flex-col rounded-2xl border border-slate-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                                        className="flex flex-col rounded-3xl border border-slate-100 bg-white/70 backdrop-blur-lg shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 overflow-hidden group relative"
                                     >
                                         {project.coverImage && (
-                                            <img src={project.coverImage} alt={project.title}
-                                                className="w-full h-36 object-cover" />
+                                            <div className="w-full h-40 overflow-hidden relative">
+                                                <img src={project.coverImage} alt={project.title}
+                                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                            </div>
                                         )}
 
                                         <div className="flex flex-col gap-3 p-4 flex-1">
