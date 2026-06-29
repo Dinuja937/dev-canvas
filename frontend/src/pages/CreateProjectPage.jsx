@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { createProject } from '../api/project.api';
 
 const animatedBgStyles = `
@@ -70,6 +71,7 @@ export default function CreateProjectPage() {
   const [coverPreview, setCoverPreview] = useState(null);
   const [extraPreviews, setExtraPreviews] = useState([]);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const e = {};
@@ -112,8 +114,13 @@ export default function CreateProjectPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const e2 = validate();
-    if (Object.keys(e2).length) return setErrors(e2);
+    if (Object.keys(e2).length) {
+      setErrors(e2);
+      Object.values(e2).forEach((msg) => toast.error(msg));
+      return;
+    }
 
+    setIsSubmitting(true);
     const formData = new FormData();
     formData.append('title', form.title);
     formData.append('description', form.description);
@@ -123,8 +130,16 @@ export default function CreateProjectPage() {
     formData.append('coverImage', coverImage);
     extraImages.forEach((file) => formData.append('extraImages', file));
 
-    await createProject(formData);
-    navigate('/');
+    try {
+      await createProject(formData);
+      toast.success('Project published successfully!');
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || err.message || 'Failed to publish project.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -191,7 +206,7 @@ export default function CreateProjectPage() {
                     </div>
                   </div>
                 )}
-                {errors.coverImage && <p className="text-red-500 text-xs mt-1.5">{errors.coverImage}</p>}
+
               </div>
             </div>
 
@@ -222,7 +237,7 @@ export default function CreateProjectPage() {
                       maxLength={50}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-950 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition"
                     />
-                    {errors.title && <p className="text-red-500 text-xs mt-0.5">{errors.title}</p>}
+
                   </div>
 
                   {/* Tech Stack Tags */}
@@ -281,7 +296,7 @@ export default function CreateProjectPage() {
                     rows={6}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-950 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition resize-none"
                   />
-                  {errors.description && <p className="text-red-500 text-xs mt-0.5">{errors.description}</p>}
+
                 </div>
 
                 {/* Row 4: Extra Images Gallery */}
@@ -326,9 +341,24 @@ export default function CreateProjectPage() {
               <div className="flex justify-end gap-4 border-t border-slate-100 pt-3">
                 <button
                   type="submit"
-                  className="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm"
+                  disabled={isSubmitting}
+                  className={`px-8 py-2.5 font-bold rounded-xl shadow-md transition-all duration-200 text-sm flex items-center gap-2 ${
+                    isSubmitting
+                      ? 'bg-slate-400 text-slate-200 cursor-not-allowed'
+                      : 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-lg cursor-pointer'
+                  }`}
                 >
-                  Publish Project
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Publishing...
+                    </>
+                  ) : (
+                    'Publish Project'
+                  )}
                 </button>
               </div>
 

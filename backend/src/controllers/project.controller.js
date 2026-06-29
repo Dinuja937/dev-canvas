@@ -73,7 +73,12 @@ export const createProject = async (req, res) => {
 
 export const getProjects = async (req, res) => {
   try {
-    const projects = await Project.find().populate('studentId', 'name email profilePic');
+    const { userId } = req.query;
+    const query = {};
+    if (userId) {
+      query.studentId = userId;
+    }
+    const projects = await Project.find(query).populate('studentId', 'name email profilePic');
     res.json(projects);
   } catch (err) {
     res.status(500).json({ message: err.message });
