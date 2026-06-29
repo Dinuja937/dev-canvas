@@ -1,70 +1,8 @@
-// Create, read, update, delete project logic
-import Project from '../models/Project.js';
-import eventBus from '../events/eventBus.js';
-import cloudinary from '../lib/cloudinary.js';
-
-// Helper: upload a file buffer to Cloudinary
-const uploadToCloudinary = (buffer, folder) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: 'image' },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result.secure_url);
-      }
-    );
-    stream.end(buffer);
-  });
-};
+import * as projectService from '../services/project.service.js';
 
 export const createProject = async (req, res) => {
   try {
-    let coverImageUrl = '';
-    let extraImageUrls = [];
-
-    // Upload cover image if provided
-    if (req.files?.coverImage?.[0]) {
-      coverImageUrl = await uploadToCloudinary(
-        req.files.coverImage[0].buffer,
-        'dev-canvas/projects'
-      );
-    }
-
-    // Upload extra images if provided
-    if (req.files?.extraImages?.length) {
-      extraImageUrls = await Promise.all(
-        req.files.extraImages.map((file) =>
-          uploadToCloudinary(file.buffer, 'dev-canvas/projects/extras')
-        )
-      );
-    }
-
-    let tagsArray = [];
-    if (req.body.tags) {
-      tagsArray = typeof req.body.tags === 'string'
-        ? req.body.tags.split(',').map((t) => t.trim()).filter(Boolean)
-        : req.body.tags;
-    }
-
-    const project = new Project({
-      title: req.body.title,
-      description: req.body.description,
-      githubUrl: req.body.githubUrl,
-      demoUrl: req.body.demoUrl,
-      tags: tagsArray,
-      studentId: req.user.id,
-      coverImage: coverImageUrl,
-      extraImages: extraImageUrls,
-    });
-
-    await project.save();
-
-
-    eventBus.emit("project:created", {
-      project,
-      creator: req.user,
-    });
-
+    const project = await projectService.createProject(req.body, req.files, req.user);
     res.status(201).json(project);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -73,12 +11,7 @@ export const createProject = async (req, res) => {
 
 export const getProjects = async (req, res) => {
   try {
-    const { userId } = req.query;
-    const query = {};
-    if (userId) {
-      query.studentId = userId;
-    }
-    const projects = await Project.find(query).populate('studentId', 'name email profilePic');
+    const projects = await projectService.getProjects(req.query.userId);
     res.json(projects);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -87,69 +20,34 @@ export const getProjects = async (req, res) => {
 
 export const getProjectById = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id).populate('studentId', 'name email profilePic');
-    if (!project) return res.status(404).json({ message: 'Project not found' });
+    const project = await projectService.getProjectById(req.params.id);
     res.json(project);
   } catch (err) {
+    if (err.message === 'Project not found') {
+      return res.status(404).json({ message: 'Project not found' });
+    }
     res.status(500).json({ message: err.message });
   }
 };
 
 export const updateProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
-    if (!project) return res.status(404).json({ message: 'Project not found' });
-    if (project.studentId.toString() !== req.user.id)
-      return res.status(403).json({ message: 'Unauthorized' });
-
-    // Upload new cover image if provided
-    if (req.files?.coverImage?.[0]) {
-      project.coverImage = await uploadToCloudinary(
-        req.files.coverImage[0].buffer,
-        'dev-canvas/projects'
-      );
-    }
-
-    // Upload new extra images if provided
-    if (req.files?.extraImages?.length) {
-      project.extraImages = await Promise.all(
-        req.files.extraImages.map((file) =>
-          uploadToCloudinary(file.buffer, 'dev-canvas/projects/extras')
-        )
-      );
-    }
-
-    // Update text and link fields
-    const { title, description, githubUrl, demoUrl, tags } = req.body;
-    if (title) project.title = title;
-    if (description) project.description = description;
-    if (githubUrl !== undefined) project.githubUrl = githubUrl;
-    if (demoUrl !== undefined) project.demoUrl = demoUrl;
-    if (tags !== undefined) {
-      project.tags = typeof tags === 'string'
-        ? tags.split(',').map((t) => t.trim()).filter(Boolean)
-        : tags;
-    }
-
-    await project.save();
+    const project = await projectService.updateProject(req.params.id, req.body, req.files, req.user.id);
     res.json(project);
   } catch (err) {
+    if (err.message === 'Project not found') return res.status(404).json({ message: err.message });
+    if (err.message === 'Unauthorized') return res.status(403).json({ message: err.message });
     res.status(500).json({ message: err.message });
   }
-
 };
-
 
 export const deleteProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
-    if (!project) return res.status(404).json({ message: 'Project not found' });
-    if (project.studentId.toString() !== req.user.id)
-      return res.status(403).json({ message: 'Unauthorized' });
-
-    await project.deleteOne();
-    res.json({ message: 'Project deleted' });
+    const result = await projectService.deleteProject(req.params.id, req.user.id);
+    res.json(result);
   } catch (err) {
+    if (err.message === 'Project not found') return res.status(404).json({ message: err.message });
+    if (err.message === 'Unauthorized') return res.status(403).json({ message: err.message });
     res.status(500).json({ message: err.message });
   }
 };
