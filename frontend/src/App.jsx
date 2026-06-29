@@ -44,7 +44,7 @@ function App() {
           }
         />
 
-        {/* Protected Core Routes (wrapped in global Layout) */}
+        {/* Catch-all Redirect */}
         <Route
           element={
             <ProtectedRoute>
@@ -88,10 +88,10 @@ function App() {
               </ProtectedRoute>
             }
           />
-        </Route>
 
-        {/* Catch-all Redirect */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Catch-all Redirect inside layout to prevent navbar unmounting */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
     </BrowserRouter>
     </>

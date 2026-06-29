@@ -112,7 +112,7 @@ const Navbar = () => {
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-50">
                 {/* Dashboard - ADMIN only -> Moved to Main Nav */}
-                {user.role === 'ADMIN' && (
+                {(user.role === 'ADMIN' || user.role === 'RECRUITER') && (
                   <button
                     onClick={() => { setIsDropdownOpen(false); navigate('/profile'); }}
                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer text-left"
