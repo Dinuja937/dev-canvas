@@ -61,7 +61,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="flex-1 w-full bg-white font-sans">
+        <div className="flex-1 w-full bg-white font-sans flex flex-col overflow-hidden max-h-[calc(100vh-65px)]">
             <style>{`
                 @keyframes profileFadeIn {
                     from { opacity:0; transform:translateY(18px); }
@@ -73,7 +73,7 @@ const ProfilePage = () => {
                 .profile-fade-3 { animation: profileFadeIn 0.35s ease 0.20s both; }
             `}</style>
 
-            <main className="max-w-3xl mx-auto px-6 sm:px-10 py-12 flex flex-col gap-7">
+            <main className="max-w-3xl w-full mx-auto px-6 sm:px-10 py-4 flex flex-col gap-4 overflow-y-auto flex-1">
 
                 {/* Back button */}
                 <button
@@ -106,7 +106,7 @@ const ProfilePage = () => {
                     }}
                 >
                     {/* Purple banner */}
-                    <div style={{ height: 90, background: 'linear-gradient(135deg,#7c3aed 0%,#a78bfa 60%,#818cf8 100%)' }} />
+                    <div style={{ height: 60, background: 'linear-gradient(135deg,#7c3aed 0%,#a78bfa 60%,#818cf8 100%)' }} />
 
                     {!isEditing ? (
                         <div className="px-8 pb-8" style={{ marginTop: -44 }}>
