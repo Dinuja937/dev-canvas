@@ -27,13 +27,15 @@ const Navbar = () => {
   }, []);
 
   const activeLinkClass = ({ isActive }) =>
-    `px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${isActive
-      ? 'bg-slate-50 border-slate-200/60 text-slate-900'
-      : 'border-transparent text-slate-500 hover:text-slate-900'
+    `relative px-1 py-1 mx-3 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 ${isActive
+      ? 'text-slate-900 border-b-2 border-purple-600'
+      : 'text-slate-500 border-b-2 border-transparent hover:text-slate-900'
     }`;
 
+  const uploadBtnClass = "px-6 py-2.5 ml-4 bg-slate-900 text-white text-xs font-bold uppercase tracking-[0.1em] rounded-full hover:bg-black transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.15)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] border border-slate-800";
+
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-slate-100 px-6 sm:px-12 py-4 flex justify-between items-center w-full box-border">
+    <nav className="sticky top-0 z-50 bg-transparent px-6 sm:px-12 py-5 flex justify-between items-center w-full box-border">
       {/* Left side - Logo & Name */}
       <NavLink to="/" className="flex items-center gap-3.5 no-underline">
         <div className="grid grid-cols-2 gap-1 w-6 h-6 rotate-45">
@@ -50,14 +52,25 @@ const Navbar = () => {
       {/* Middle Section - Navigation Links (Desktop) */}
       <div className="hidden md:flex items-center gap-2">
         {navLinks.map((link) => (
-          <NavLink
-            key={link.path}
-            to={link.path}
-            end={link.end}
-            className={activeLinkClass}
-          >
-            {link.label}
-          </NavLink>
+          link.path === '/upload' ? (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              end={link.end}
+              className={uploadBtnClass}
+            >
+              {link.label}
+            </NavLink>
+          ) : (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              end={link.end}
+              className={activeLinkClass}
+            >
+              {link.label}
+            </NavLink>
+          )
         ))}
       </div>
 
@@ -98,18 +111,7 @@ const Navbar = () => {
             {/* Dropdown Menu */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-50">
-                {/* Dashboard - ADMIN only */}
-                {user.role === 'ADMIN' && (
-                  <button
-                    onClick={() => { setIsDropdownOpen(false); navigate('/admin'); }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer text-left"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Admin Dashboard
-                  </button>
-                )}
+                {/* Dashboard - ADMIN only -> Moved to Main Nav */}
                 {user.role === 'ADMIN' && (
                   <button
                     onClick={() => { setIsDropdownOpen(false); navigate('/profile'); }}
@@ -158,15 +160,27 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-100 p-6 flex flex-col gap-4 shadow-lg md:hidden">
           {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              end={link.end}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-slate-600 hover:text-slate-900 font-semibold py-1.5"
-            >
-              {link.label}
-            </NavLink>
+            link.path === '/upload' ? (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end={link.end}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-center w-full py-3.5 bg-slate-900 hover:bg-black text-white rounded-xl font-bold uppercase tracking-[0.1em] text-xs transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.15)] mt-2"
+              >
+                {link.label}
+              </NavLink>
+            ) : (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end={link.end}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-slate-600 hover:text-slate-900 font-bold uppercase tracking-widest text-xs py-2 px-2"
+              >
+                {link.label}
+              </NavLink>
+            )
           ))}
           <div className="h-px bg-slate-100 my-1"></div>
           {user && (
@@ -184,15 +198,7 @@ const Navbar = () => {
               </div>
             </div>
           )}
-          {/* Dashboard link in mobile - ADMIN only */}
-          {user?.role === 'ADMIN' && (
-            <button
-              onClick={() => { setIsMobileMenuOpen(false); navigate('/admin'); }}
-              className="w-full py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-semibold text-sm transition-all cursor-pointer"
-            >
-              Dashboard
-            </button>
-          )}
+          {/* Dashboard link in mobile - ADMIN only -> Moved to Main Nav */}
           <button
             onClick={() => { setIsMobileMenuOpen(false); setShowLogoutModal(true); }}
             className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition-all cursor-pointer"

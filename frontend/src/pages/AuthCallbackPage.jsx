@@ -17,7 +17,7 @@ const AuthCallbackPage = () => {
         if (user && user.isNewUser) {
           navigate('/select-role');
         } else {
-          navigate('/');
+          navigate(user?.role === 'ADMIN' ? '/admin' : '/');
         }
       });
     } else {
