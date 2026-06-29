@@ -331,13 +331,12 @@ const AdminPage = () => {
             setIsLoading(true);
             setError(null);
             try {
-                if (activeTab === 'Users') {
-                    const res = await getAllUsers();
-                    setUsers(res.data.data);
-                } else {
-                    const res = await getAllProjects();
-                    setProjects(res.data.data);
-                }
+                const [usersRes, projectsRes] = await Promise.all([
+                    getAllUsers(),
+                    getAllProjects()
+                ]);
+                setUsers(usersRes.data.data);
+                setProjects(projectsRes.data.data);
             } catch (err) {
                 setError(err?.response?.data?.message || 'Failed to load data. Please try again.');
             } finally {
@@ -345,7 +344,7 @@ const AdminPage = () => {
             }
         };
         fetchData();
-    }, [activeTab]);
+    }, []);
 
     const formatDate = (dateStr) =>
         new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
