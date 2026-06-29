@@ -26,3 +26,4 @@ router.put('/:id', authMiddleware, projectUpload, updateProject);
 router.delete('/:id', authMiddleware, deleteProject);
 
 export default router;
+

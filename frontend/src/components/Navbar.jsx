@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import { authService } from '../services/auth.service';
 import { navigationConfig } from '../routing/navigationConfig';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const { user } = useAuthStore();
@@ -50,6 +51,7 @@ const Navbar = () => {
 
       {/* Right Side Actions (Desktop) */}
       <div className="hidden md:flex items-center gap-6">
+        {user && <NotificationBell />}
         {user && (
           <div className="flex items-center gap-3">
             {user.profilePic ? (
@@ -78,7 +80,8 @@ const Navbar = () => {
       </div>
 
       {/* Mobile menu hamburger button */}
-      <div className="md:hidden">
+      <div className="md:hidden flex items-center gap-3">
+        {user && <NotificationBell />}
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="text-slate-600 hover:text-slate-900 focus:outline-none cursor-pointer"

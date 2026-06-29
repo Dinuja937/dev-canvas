@@ -47,7 +47,13 @@ export const createProject = async (req, res) => {
     });
 
     await project.save();
-    eventBus.emit('project:created', project);
+    
+    
+    eventBus.emit("project:created", {
+      project,
+      creator: req.user,
+    });
+    
     res.status(201).json(project);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -107,18 +113,5 @@ export const updateProject = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-};
 
-export const deleteProject = async (req, res) => {
-  try {
-    const project = await Project.findById(req.params.id);
-    if (!project) return res.status(404).json({ message: 'Project not found' });
-    if (project.studentId.toString() !== req.user.id)
-      return res.status(403).json({ message: 'Unauthorized' });
-
-    await project.deleteOne();
-    res.json({ message: 'Project deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
 };
