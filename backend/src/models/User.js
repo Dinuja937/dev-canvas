@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
   isNewUser: {
     type: Boolean,
     default: true
+  },
+  isDisabled: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

@@ -17,8 +17,8 @@ import HomePage from './pages/HomePage';
 import CreateProjectPage from './pages/CreateProjectPage';
 // import ProjectDetailPage from './pages/ProjectDetailPage';
 import EditProjectPage from './pages/EditProjectPage';
+import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
-// import AdminPage from './pages/AdminPage';
 
 function App() {
   useEffect(() => {
@@ -53,6 +53,16 @@ function App() {
           }
         >
           <Route path="/" element={<HomePage />} />
+          <Route path="/upload" element={<CreateProjectPage />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route
             path="/upload"
             element={
@@ -78,14 +88,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AdminPage />
-              </ProtectedRoute>
-            } 
-          /> */}
         </Route>
 
         {/* Catch-all Redirect */}
