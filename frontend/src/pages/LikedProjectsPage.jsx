@@ -4,7 +4,7 @@ import { getLikedProjects } from '../api/like.api';
 import ProjectCard from '../components/ProjectCard';
 
 const SkeletonCard = () => (
-  <div className="rounded-2xl border border-slate-100 bg-white overflow-hidden animate-pulse">
+  <div className="rounded-xl border border-slate-100 bg-white overflow-hidden animate-pulse">
     <div className="w-full aspect-[16/9] bg-slate-100" />
     <div className="p-5 flex flex-col gap-3">
       <div className="flex gap-2">
@@ -91,8 +91,8 @@ const LikedProjectsPage = () => {
 
         {/* Empty state */}
         {!isLoading && !error && projects.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 px-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-            <div className="w-16 h-16 rounded-2xl bg-rose-50 flex items-center justify-center mb-5">
+          <div className="flex flex-col items-center justify-center py-24 px-6 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/30">
+            <div className="w-16 h-16 rounded-xl bg-rose-50 flex items-center justify-center mb-5">
               <svg className="w-8 h-8 text-rose-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
               </svg>
@@ -114,7 +114,7 @@ const LikedProjectsPage = () => {
         {!isLoading && !error && projects.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project, idx) => (
-              <div key={project._id} style={{ animation: `fadeUp 0.4s ease both`, animationDelay: `${idx * 0.05}s` }}>
+              <div key={project._id} className="h-full" style={{ animation: `fadeUp 0.4s ease both`, animationDelay: `${idx * 0.05}s` }}>
                 <ProjectCard project={project} />
               </div>
             ))}

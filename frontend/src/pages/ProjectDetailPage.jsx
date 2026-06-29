@@ -174,7 +174,7 @@ const ProjectDetailPage = () => {
         </button>
 
         {/* ── Hero cover image ───────────────────────────────────── */}
-        <div className="relative w-full aspect-[16/7] rounded-2xl overflow-hidden bg-slate-100 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.12)]">
+        <div className="relative w-full aspect-[16/7] rounded-xl overflow-hidden bg-slate-100 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.12)]">
           {project.coverImage ? (
             <img
               src={project.coverImage}
@@ -310,21 +310,24 @@ const ProjectDetailPage = () => {
           {/* ── Right sidebar: Author card ─────────────────────── */}
           <div className="lg:w-72 shrink-0">
             <div className="sticky top-24 flex flex-col gap-4">
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-6 flex flex-col gap-5">
+              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-6 flex flex-col gap-5">
                 <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Built by</h2>
 
                 {/* Author info */}
-                <div className="flex items-center gap-3">
+                <div 
+                  onClick={() => authorId && navigate(`/students/${authorId}`)}
+                  className={`flex items-center gap-3 ${authorId ? 'cursor-pointer group' : ''}`}
+                >
                   {author?.profilePic ? (
                     <img src={author.profilePic} alt={authorName}
-                      className="w-14 h-14 rounded-full object-cover ring-2 ring-white shadow-md shrink-0" />
+                      className="w-14 h-14 rounded-full object-cover ring-2 ring-white shadow-md shrink-0 group-hover:ring-purple-200 transition-all" />
                   ) : (
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center font-black text-xl ring-2 ring-white shadow-md shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center font-black text-xl ring-2 ring-white shadow-md shrink-0 group-hover:ring-purple-200 transition-all">
                       {authorInitial}
                     </div>
                   )}
                   <div className="flex flex-col min-w-0">
-                    <span className="font-extrabold text-slate-900 text-base truncate tracking-tight">{authorName}</span>
+                    <span className="font-extrabold text-slate-900 text-base truncate tracking-tight group-hover:text-purple-700 transition-colors">{authorName}</span>
                     {author?.email && (
                       <span className="text-xs text-slate-400 font-medium truncate">{author.email}</span>
                     )}
@@ -375,7 +378,7 @@ const ProjectDetailPage = () => {
           <img
             src={lightboxImg}
             alt="Preview"
-            className="max-w-full max-h-full rounded-2xl shadow-2xl"
+            className="max-w-full max-h-full rounded-xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           />
           <button

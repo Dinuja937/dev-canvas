@@ -94,7 +94,7 @@ const ProjectCard = ({ project, onLikeChange }) => {
   return (
     <article
       onClick={() => navigate(`/projects/${project._id}`, { state: { project } })}
-      className="group relative flex flex-col rounded-2xl border border-slate-100 bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_-12px_rgba(124,58,237,0.13)] hover:border-purple-100 cursor-pointer"
+      className="group relative flex flex-col h-full rounded-xl border border-slate-200 bg-white overflow-hidden transition-all duration-300 cursor-pointer"
     >
 
       {/* ── Cover image ─────────────────────────────────────── */}
@@ -165,7 +165,7 @@ const ProjectCard = ({ project, onLikeChange }) => {
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-slate-900 hover:bg-black transition-colors"
               >
                 <ExternalIcon /> Live Demo
               </a>
@@ -181,19 +181,19 @@ const ProjectCard = ({ project, onLikeChange }) => {
               <img
                 src={author.profilePic}
                 alt={authorName}
-                className="w-7 h-7 rounded-full object-cover ring-2 ring-white shadow-sm shrink-0"
+                className="w-9 h-9 rounded-full object-cover ring-2 ring-white shrink-0"
               />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center font-bold text-[11px] ring-2 ring-white shadow-sm shrink-0">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center font-bold text-xs ring-2 ring-white shrink-0">
                 {authorInitial}
               </div>
             )}
-            <div className="flex flex-col min-w-0">
-              <span className="text-[12px] font-semibold text-slate-700 truncate leading-none">
+            <div className="flex flex-col min-w-0 justify-center">
+              <span className="text-sm font-bold text-slate-700 truncate leading-none mb-0.5">
                 {authorName}
               </span>
               {project.createdAt && (
-                <span className="text-[10px] text-slate-400 font-medium mt-0.5">
+                <span className="text-xs text-slate-400 font-medium">
                   {timeAgo(project.createdAt)}
                 </span>
               )}

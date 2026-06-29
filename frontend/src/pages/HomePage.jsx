@@ -4,7 +4,7 @@ import ProjectCard from '../components/ProjectCard';
 
 /* ── Skeleton Card ─────────────────────────────────────────────── */
 const SkeletonCard = () => (
-  <div className="rounded-2xl border border-slate-100 bg-white overflow-hidden animate-pulse">
+  <div className="rounded-xl border border-slate-100 bg-white overflow-hidden animate-pulse">
     <div className="w-full aspect-[16/9] bg-slate-100" />
     <div className="p-5 flex flex-col gap-3">
       <div className="flex gap-2">
@@ -152,8 +152,8 @@ const HomePage = () => {
 
           {/* Empty state */}
           {!isLoading && !error && filtered.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-24 px-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center mb-5">
+            <div className="flex flex-col items-center justify-center py-24 px-6 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/30">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center mb-5">
                 <svg className="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                 </svg>
@@ -169,9 +169,11 @@ const HomePage = () => {
 
           {/* Project grid using the shared ProjectCard component */}
           {!isLoading && !error && filtered.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((project) => (
-                <ProjectCard key={project._id} project={project} />
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {filtered.map((project, idx) => (
+                <div key={project._id} className="h-full" style={{ animation: `cardFadeIn 0.4s ease both`, animationDelay: `${idx * 0.05}s` }}>
+                  <ProjectCard project={project} />
+                </div>
               ))}
             </div>
           )}

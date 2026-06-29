@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getFollowingList, toggleFollow } from '../api/follow.api';
 
 const SkeletonStudentCard = () => (
-  <div className="flex items-center gap-4 p-5 rounded-2xl border border-slate-100 bg-white animate-pulse">
+  <div className="flex items-center gap-4 p-5 rounded-xl border border-slate-100 bg-white animate-pulse">
     <div className="w-14 h-14 rounded-full bg-slate-100 shrink-0" />
     <div className="flex-1 flex flex-col gap-2">
       <div className="h-4 w-32 bg-slate-100 rounded-lg" />
@@ -34,7 +34,7 @@ const StudentCard = ({ student, onUnfollow }) => {
   return (
     <div
       onClick={() => navigate(`/students/${student._id}`)}
-      className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer"
+      className="group flex items-center gap-4 p-5 rounded-xl border border-slate-100 bg-white hover:border-slate-200 transition-all duration-300 cursor-pointer"
     >
       {/* Avatar */}
       {student.profilePic ? (
