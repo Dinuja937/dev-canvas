@@ -1,52 +1,189 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getProjects } from '../api/project.api';
+import ProjectCard from '../components/ProjectCard';
 
+/* ── Skeleton Card ─────────────────────────────────────────────── */
+const SkeletonCard = () => (
+  <div className="rounded-2xl border border-slate-100 bg-white overflow-hidden animate-pulse">
+    <div className="w-full aspect-[16/9] bg-slate-100" />
+    <div className="p-5 flex flex-col gap-3">
+      <div className="flex gap-2">
+        <div className="h-4 w-14 bg-slate-100 rounded-full" />
+        <div className="h-4 w-10 bg-slate-100 rounded-full" />
+      </div>
+      <div className="h-5 w-3/4 bg-slate-100 rounded-lg" />
+      <div className="h-4 w-full bg-slate-100 rounded-lg" />
+      <div className="h-4 w-2/3 bg-slate-100 rounded-lg" />
+      <div className="mt-2 pt-4 border-t border-slate-50 flex items-center gap-2">
+        <div className="w-7 h-7 rounded-full bg-slate-100" />
+        <div className="h-4 w-24 bg-slate-100 rounded-lg" />
+      </div>
+    </div>
+  </div>
+);
+
+/* ── Main HomePage ─────────────────────────────────────────────── */
 const HomePage = () => {
+  const [projects, setProjects]   = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError]         = useState(null);
+  const [activeTag, setActiveTag] = useState('All');
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await getProjects();
+        setProjects(res.data?.data || res.data || []);
+      } catch {
+        setError('Failed to load projects.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  // Collect unique tags dynamically from all projects
+  const allTags = ['All', ...new Set(projects.flatMap((p) => p.tags || []))].slice(0, 8);
+
+  const filtered = activeTag === 'All'
+    ? projects
+    : projects.filter((p) => p.tags?.includes(activeTag));
+
   return (
     <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-12 flex flex-col gap-12 box-border">
 
-      {/* Main content container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-12 py-10 flex flex-col gap-10 box-border">
-        {/* Banner Area */}
-        <section className="text-center py-16 px-6 rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.08)_0%,rgba(255,255,255,0)_70%)] border border-purple-500/5">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-            Student Project Showcase
-          </h1>
-          <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            Discover, review, and appreciate innovative tech concepts and builds created by the Faculty of Computing students.
-          </p>
-        </section>
-
-        {/* Feed section */}
-        <section className="flex flex-col gap-6">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Recent Projects</h2>
-            <div className="flex gap-2">
-              <button className="px-4 py-1.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 focus:outline-none cursor-pointer">
-                All
-              </button>
-              <button className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-500 hover:bg-slate-50 focus:outline-none cursor-pointer">
-                Web
-              </button>
-              <button className="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-500 hover:bg-slate-50 focus:outline-none cursor-pointer">
-                Mobile
-              </button>
-            </div>
+        {/* ── Hero ─────────────────────────────────────────────── */}
+        <section
+          className="relative flex flex-col items-center text-center gap-6 py-14 px-6 overflow-hidden"
+          style={{ animation: 'cardFadeIn 0.6s ease both' }}
+        >
+          {/* Ambient glow blobs */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div style={{ position: 'absolute', top: -60, left: '20%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(168,85,247,0.09) 0%, transparent 70%)', filter: 'blur(40px)', borderRadius: '50%' }} />
+            <div style={{ position: 'absolute', top: -40, right: '20%', width: 320, height: 320, background: 'radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 70%)', filter: 'blur(40px)', borderRadius: '50%' }} />
           </div>
 
-          {/* Empty state container */}
-          <div className="flex flex-col items-center justify-center py-20 px-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-6">
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-              </svg>
-            </div>
-            <h3 className="text-slate-900 text-lg font-bold mb-2">No Projects Uploaded Yet</h3>
-            <p className="text-slate-400 text-sm max-w-xs text-center leading-relaxed">
-              Check back shortly or publish your own computing project showcase to get started!
+          <div className="relative flex flex-col gap-4 max-w-2xl">
+            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
+              Where Great Code{' '}
+              <span className="relative inline-block">
+                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-fuchsia-500">
+                  Gets Seen
+                </span>
+                <span className="absolute -bottom-1 left-0 right-0 h-[3px] rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-400 opacity-40" />
+              </span>
+            </h1>
+            <p className="text-slate-500 text-base sm:text-lg leading-relaxed font-medium">
+              Real projects. Real builders. Explore what the next generation of developers is shipping.
             </p>
           </div>
+
+          {/* Live stats — only shown once data loads */}
+          {!isLoading && projects.length > 0 && (
+            <div className="relative flex items-center gap-6 mt-2">
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-black text-slate-900 tracking-tight">{projects.length}</span>
+                <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Projects</span>
+              </div>
+              <div className="w-px h-8 bg-slate-100" />
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-black text-slate-900 tracking-tight">
+                  {new Set(projects.map((p) => p.studentId?._id).filter(Boolean)).size}
+                </span>
+                <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Builders</span>
+              </div>
+              <div className="w-px h-8 bg-slate-100" />
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-black text-slate-900 tracking-tight">
+                  {new Set(projects.flatMap((p) => p.tags || [])).size}
+                </span>
+                <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Technologies</span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* ── Feed ─────────────────────────────────────────────── */}
+        <section className="flex flex-col gap-8">
+
+          {/* Filter bar */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-widest mr-2">Browse</h2>
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(tag)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer focus:outline-none border ${
+                    activeTag === tag
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                      : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400 hover:text-slate-700'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+            <span className="text-xs text-slate-400 font-semibold">
+              {isLoading ? '—' : `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`}
+            </span>
+          </div>
+
+          {/* Error banner */}
+          {error && (
+            <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium">
+              <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              {error}
+            </div>
+          )}
+
+          {/* Skeletons while loading */}
+          {isLoading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!isLoading && !error && filtered.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-24 px-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center mb-5">
+                <svg className="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                </svg>
+              </div>
+              <h3 className="text-slate-900 text-lg font-extrabold mb-1.5 tracking-tight">Nothing here yet</h3>
+              <p className="text-slate-400 text-sm max-w-xs text-center leading-relaxed">
+                {activeTag === 'All'
+                  ? 'Be the first to publish your project and claim your spot on the showcase.'
+                  : `No projects tagged with "${activeTag}" yet.`}
+              </p>
+            </div>
+          )}
+
+          {/* Project grid using the shared ProjectCard component */}
+          {!isLoading && !error && filtered.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((project) => (
+                <ProjectCard key={project._id} project={project} />
+              ))}
+            </div>
+          )}
         </section>
       </main>
+
+      <style>{`
+        @keyframes cardFadeIn {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 };

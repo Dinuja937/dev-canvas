@@ -15,7 +15,7 @@ import AuthCallbackPage from './pages/AuthCallbackPage';
 import SelectRolePage from './pages/SelectRolePage';
 import HomePage from './pages/HomePage';
 import CreateProjectPage from './pages/CreateProjectPage';
-// import ProjectDetailPage from './pages/ProjectDetailPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 import EditProjectPage from './pages/EditProjectPage';
 import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
@@ -79,7 +79,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route path="/projects/:id" element={<ProjectDetailPage />} /> */}
+          <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route
             path="/my-portfolio"
             element={
