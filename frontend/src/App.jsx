@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import useAuthStore from './store/authStore';
 import ProtectedRoute from './routing/ProtectedRoute';
 
@@ -13,6 +15,7 @@ import AuthCallbackPage from './pages/AuthCallbackPage';
 import SelectRolePage from './pages/SelectRolePage';
 import HomePage from './pages/HomePage';
 import CreateProjectPage from './pages/CreateProjectPage';
+// import ProjectDetailPage from './pages/ProjectDetailPage';
 import EditProjectPage from './pages/EditProjectPage';
 import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
@@ -23,7 +26,9 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <>
+      <ToastContainer position="bottom-right" autoClose={4000} hideProgressBar={true} theme="colored" />
+      <BrowserRouter>
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
@@ -49,7 +54,6 @@ function App() {
         >
           <Route path="/" element={<HomePage />} />
           <Route path="/upload" element={<CreateProjectPage />} />
-          <Route path="/edit/:id" element={<EditProjectPage />} />
           <Route
             path="/admin"
             element={
@@ -59,12 +63,38 @@ function App() {
             }
           />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/upload"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <CreateProjectPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-project/:id"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <EditProjectPage />
+              </ProtectedRoute>
+            }
+          />
+          {/* <Route path="/projects/:id" element={<ProjectDetailPage />} /> */}
+          <Route
+            path="/my-portfolio"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Catch-all Redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 
