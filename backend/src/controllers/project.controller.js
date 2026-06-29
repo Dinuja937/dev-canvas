@@ -1,7 +1,7 @@
 // Create, read, update, delete project logic
 import Project from '../models/Project.js';
-import { eventBus } from '../events/eventBus.js';
-import cloudinary from '../lib/cloudinary.js'; 
+import eventBus from '../events/eventBus.js';
+import cloudinary from '../lib/cloudinary.js';
 
 // Helper: upload a file buffer to Cloudinary
 const uploadToCloudinary = (buffer, folder) => {
@@ -39,21 +39,32 @@ export const createProject = async (req, res) => {
       );
     }
 
+    let tagsArray = [];
+    if (req.body.tags) {
+      tagsArray = typeof req.body.tags === 'string'
+        ? req.body.tags.split(',').map((t) => t.trim()).filter(Boolean)
+        : req.body.tags;
+    }
+
     const project = new Project({
-      ...req.body,
+      title: req.body.title,
+      description: req.body.description,
+      githubUrl: req.body.githubUrl,
+      demoUrl: req.body.demoUrl,
+      tags: tagsArray,
       studentId: req.user.id,
       coverImage: coverImageUrl,
       extraImages: extraImageUrls,
     });
 
     await project.save();
-    
-    
+
+
     eventBus.emit("project:created", {
       project,
       creator: req.user,
     });
-    
+
     res.status(201).json(project);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -103,10 +114,17 @@ export const updateProject = async (req, res) => {
       );
     }
 
-    // Update text fields
-    const { title, description } = req.body;
+    // Update text and link fields
+    const { title, description, githubUrl, demoUrl, tags } = req.body;
     if (title) project.title = title;
     if (description) project.description = description;
+    if (githubUrl !== undefined) project.githubUrl = githubUrl;
+    if (demoUrl !== undefined) project.demoUrl = demoUrl;
+    if (tags !== undefined) {
+      project.tags = typeof tags === 'string'
+        ? tags.split(',').map((t) => t.trim()).filter(Boolean)
+        : tags;
+    }
 
     await project.save();
     res.json(project);
@@ -114,4 +132,19 @@ export const updateProject = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 
+};
+
+
+export const deleteProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+    if (project.studentId.toString() !== req.user.id)
+      return res.status(403).json({ message: 'Unauthorized' });
+
+    await project.deleteOne();
+    res.json({ message: 'Project deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

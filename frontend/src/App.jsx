@@ -12,6 +12,10 @@ import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import SelectRolePage from './pages/SelectRolePage';
 import HomePage from './pages/HomePage';
+import CreateProjectPage from './pages/CreateProjectPage';
+// import ProjectDetailPage from './pages/ProjectDetailPage';
+// import ProfilePage from './pages/ProfilePage';
+// import AdminPage from './pages/AdminPage';
 
 function App() {
   useEffect(() => {
@@ -26,13 +30,13 @@ function App() {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
         {/* Protected Onboarding Route */}
-        <Route 
-          path="/select-role" 
+        <Route
+          path="/select-role"
           element={
             <ProtectedRoute>
               <SelectRolePage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Protected Core Routes (wrapped in global Layout) */}
@@ -44,6 +48,39 @@ function App() {
           }
         >
           <Route path="/" element={<HomePage />} />
+          <Route
+            path="/upload"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <CreateProjectPage />
+              </ProtectedRoute>
+            }
+          />
+          {/* <Route
+            path="/edit-project/:id"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <EditProjectPage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route path="/projects/:id" element={<ProjectDetailPage />} /> */}
+          {/* <Route
+            path="/my-portfolio"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminPage />
+              </ProtectedRoute>
+            } 
+          /> */}
         </Route>
 
         {/* Catch-all Redirect */}
