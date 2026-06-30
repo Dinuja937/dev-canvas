@@ -88,55 +88,71 @@ const NotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 w-80 max-w-[calc(100vw-2rem)] bg-white border border-slate-100 rounded-lg shadow-xl overflow-hidden z-50">
-          <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-900">Notifications</h2>
-            <span className="text-xs font-semibold text-slate-500">{unreadCount} unread</span>
+        <div
+          className="absolute right-0 sm:right-0 top-14 w-[340px] max-w-[calc(100vw-2rem)] bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden z-50 origin-top-right animate-in fade-in zoom-in-95 duration-200"
+        >
+          {/* Top Header */}
+          <div className="px-5 py-4 border-b border-slate-100/80 flex items-center justify-between bg-slate-50/50">
+            <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">Notifications</h2>
+            {unreadCount > 0 ? (
+              <span className="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-700 rounded-md uppercase tracking-wider">
+                {unreadCount} New
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md uppercase tracking-wider">
+                All Read
+              </span>
+            )}
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          {/* List Container with hidden scrollbar */}
+          <div className="max-h-[24rem] overflow-y-auto no-scrollbar">
             {loading && (
-              <div className="px-4 py-6 text-sm text-slate-500 text-center">
+              <div className="px-5 py-8 text-sm text-slate-400 font-medium text-center">
                 Loading notifications...
               </div>
             )}
 
             {!loading && error && (
-              <div className="px-4 py-6 text-sm text-red-600 text-center">
+              <div className="px-5 py-8 text-sm text-red-500 font-medium text-center">
                 {error}
               </div>
             )}
 
             {!loading && !error && notifications.length === 0 && (
-              <div className="px-4 py-6 text-sm text-slate-500 text-center">
-                No notifications yet
+              <div className="px-5 py-12 flex flex-col items-center justify-center text-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mb-1">
+                  <svg className="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 01-6 0m6 0H9" />
+                  </svg>
+                </div>
+                <p className="text-sm font-semibold text-slate-900">You're all caught up</p>
+                <p className="text-xs text-slate-400">No new notifications right now.</p>
               </div>
             )}
 
             {!loading && !error && notifications.map((notification) => (
               <div
                 key={notification._id}
-                className={`px-4 py-3 border-b border-slate-100 last:border-b-0 ${
-                  notification.isRead ? 'bg-white' : 'bg-purple-50/60'
-                }`}
+                className={`px-5 py-4 border-b border-slate-50 last:border-b-0 transition-colors ${notification.isRead ? 'bg-white hover:bg-slate-50/50' : 'bg-purple-50/40 hover:bg-purple-50/60'
+                  }`}
               >
-                <div className="flex items-start gap-3">
-                  <span className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
-                    notification.isRead ? 'bg-slate-200' : 'bg-purple-600'
-                  }`}></span>
+                <div className="flex items-start gap-3.5">
+                  <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 shadow-sm ${notification.isRead ? 'bg-slate-200' : 'bg-purple-500'
+                    }`}></span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-slate-700 leading-snug break-words">
+                    <p className={`text-sm leading-snug break-words ${notification.isRead ? 'text-slate-600' : 'text-slate-900 font-medium'}`}>
                       {notification.message}
                     </p>
-                    <div className="mt-2 flex items-center justify-between gap-3">
-                      <span className="text-xs text-slate-400">
+                    <div className="mt-2.5 flex items-center justify-between gap-3">
+                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
                         {formatDate(notification.createdAt)}
                       </span>
                       {!notification.isRead && (
                         <button
                           type="button"
                           onClick={() => handleMarkAsRead(notification._id)}
-                          className="text-xs font-bold text-purple-600 hover:text-purple-800 cursor-pointer"
+                          className="text-[11px] font-bold text-purple-600 hover:text-purple-800 transition-colors"
                         >
                           Mark as read
                         </button>
