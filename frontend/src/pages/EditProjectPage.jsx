@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProject, updateProject } from '../api/project.api';
+import { getProject, updateProject, deleteProject } from '../api/project.api';
 import { toast } from 'react-toastify';
 import useAuthStore from '../store/authStore';
 
@@ -25,6 +25,8 @@ const EditProjectPage = () => {
   const [existingExtraImages, setExistingExtraImages] = useState([]);
   const [newExtraImages, setNewExtraImages] = useState([]);
   const [newExtraPreviews, setNewExtraPreviews] = useState([]);
+  
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -131,6 +133,20 @@ const EditProjectPage = () => {
       toast.error(error.response?.data?.message || "Failed to update project.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setIsSaving(true);
+      await deleteProject(id);
+      toast.success("Project deleted successfully!");
+      navigate('/my-portfolio');
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      toast.error(error.response?.data?.message || "Failed to delete project.");
+      setIsSaving(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -291,25 +307,66 @@ const EditProjectPage = () => {
             </div>
           </div>
 
-          <div className="pt-8 flex gap-4">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="px-8 py-2.5 bg-slate-900 text-white text-sm font-semibold hover:bg-white transition-colors disabled:opacity-50 border-2 border-slate-900 hover:text-black rounded-md"
-            >
-              {isSaving ? "Publishing Updates..." : "Save Changes"}
-            </button>
+          <div className="pt-8 flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="px-8 py-2.5 bg-slate-900 text-white text-sm font-semibold hover:bg-white transition-colors disabled:opacity-50 border-2 border-slate-900 hover:text-black rounded-md"
+              >
+                {isSaving ? "Publishing Updates..." : "Save Changes"}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/my-portfolio')}
+                className="px-8 py-2.5 bg-white text-slate-900 text-sm font-semibold border-2 border-slate-200 hover:border-slate-400 transition-colors rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
+            
             <button
               type="button"
-              onClick={() => navigate('/my-portfolio')}
-              className="px-8 py-2.5 bg-white text-slate-900 text-sm font-semibold border-2 border-slate-200 hover:border-slate-400 transition-colors rounded-md"
+              onClick={() => setShowDeleteModal(true)}
+              disabled={isSaving}
+              className="px-6 py-2.5 bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50 rounded-md border border-red-100 hover:border-red-600"
             >
-              Cancel
+              Delete Project
             </button>
           </div>
 
         </form>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete Project?</h3>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+              Are you sure you want to delete this project? This action cannot be undone and all associated images and data will be permanently lost.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isSaving}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-md transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isSaving}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-md transition-colors disabled:opacity-50"
+              >
+                {isSaving ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
