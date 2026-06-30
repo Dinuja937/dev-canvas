@@ -10,7 +10,10 @@ import {
 } from '../controllers/project.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
 
 const projectUpload = upload.fields([
   { name: 'coverImage', maxCount: 1 },
