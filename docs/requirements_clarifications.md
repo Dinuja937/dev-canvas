@@ -15,7 +15,7 @@ This document outlines the official clarifications provided by the lecturer rega
 ## 3. Sorting & Filtering
 **Question:** For the main project feed display, should the projects be displayed in a simple chronological order (most recently uploaded first), or do you expect a specific default sorting/filtering system?
 **Answer:** By default sort by time, but ideal if we have more criterias to sort.
-**Implementation:** Projects are fetched and sorted chronologically by default.
+**Implementation:** Projects are fetched and sorted chronologically by default (most recently uploaded first). Additional filtering is available via tags and the dynamic search bar.
 
 ## 4. Multiple Images & Cover Images
 **Question:** Are students allowed to upload a gallery of multiple images for a single project, or is it strictly limited to one primary thumbnail per project post?
