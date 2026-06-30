@@ -28,6 +28,7 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError]         = useState(null);
   const [activeTag, setActiveTag] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -48,9 +49,21 @@ const HomePage = () => {
   // Collect unique tags dynamically from all projects
   const allTags = ['All', ...new Set(projects.flatMap((p) => p.tags || []))].slice(0, 8);
 
-  const filtered = activeTag === 'All'
-    ? projects
-    : projects.filter((p) => p.tags?.includes(activeTag));
+  const filtered = projects.filter((p) => {
+    const matchesTag = activeTag === 'All' || p.tags?.includes(activeTag);
+    
+    if (!matchesTag) return false;
+    
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+    const matchesTitle = p.title?.toLowerCase().includes(query);
+    const matchesDesc = p.description?.toLowerCase().includes(query);
+    const matchesAuthor = p.studentId?.name?.toLowerCase().includes(query);
+    const matchesTags = p.tags?.some(tag => tag.toLowerCase().includes(query));
+
+    return matchesTitle || matchesDesc || matchesAuthor || matchesTags;
+  });
 
   return (
     <div className="flex-1 w-full bg-white text-slate-800 font-sans flex flex-col">
@@ -107,11 +120,27 @@ const HomePage = () => {
           )}
         </section>
 
+        {/* ── Big Search Bar ─────────────────────────────────────────────── */}
+        <div className="flex justify-center -mt-6 mb-4 relative z-10 px-4" style={{ animation: 'cardFadeIn 0.7s ease both' }}>
+          <div className="relative w-full max-w-2xl group">
+            <input
+              type="text"
+              placeholder="Search projects, builders, or technologies..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-14 pr-6 py-5 bg-white rounded-2xl text-lg font-medium text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] focus:shadow-[0_12px_40px_rgb(0,0,0,0.1)] transition-all duration-300 placeholder:text-slate-400 focus:outline-none focus:ring-0 border-none"
+            />
+            <svg className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-purple-500 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
         {/* ── Feed ─────────────────────────────────────────────── */}
         <section className="flex flex-col gap-8">
 
           {/* Filter bar */}
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-widest mr-2">Browse</h2>
               {allTags.map((tag) => (
@@ -128,7 +157,8 @@ const HomePage = () => {
                 </button>
               ))}
             </div>
-            <span className="text-xs text-slate-400 font-semibold">
+            
+            <span className="text-xs text-slate-400 font-semibold whitespace-nowrap">
               {isLoading ? '—' : `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`}
             </span>
           </div>
