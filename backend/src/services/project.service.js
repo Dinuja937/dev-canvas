@@ -88,13 +88,24 @@ export const updateProject = async (projectId, updateData, files, userId) => {
         );
     }
 
+    let updatedImages = project.images || [];
+    if (updateData.existingImages !== undefined) {
+        try {
+            updatedImages = JSON.parse(updateData.existingImages);
+        } catch (e) {
+            updatedImages = Array.isArray(updateData.existingImages) ? updateData.existingImages : [updateData.existingImages];
+        }
+    }
+
     if (files?.extraImages?.length) {
-        project.images = await Promise.all(
+        const newlyUploaded = await Promise.all(
             files.extraImages.map((file) =>
                 uploadToCloudinary(file.buffer, 'dev-canvas/projects/extras')
             )
         );
+        updatedImages = [...updatedImages, ...newlyUploaded];
     }
+    project.images = updatedImages;
 
     const { title, description, githubUrl, demoUrl, tags } = updateData;
     if (title) project.title = title;

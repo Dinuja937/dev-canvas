@@ -22,6 +22,9 @@ const EditProjectPage = () => {
   
   const [coverImage, setCoverImage] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
+  const [existingExtraImages, setExistingExtraImages] = useState([]);
+  const [newExtraImages, setNewExtraImages] = useState([]);
+  const [newExtraPreviews, setNewExtraPreviews] = useState([]);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -49,6 +52,9 @@ const EditProjectPage = () => {
         if (project.coverImage) {
           setCoverPreview(project.coverImage);
         }
+        if (project.images && project.images.length > 0) {
+          setExistingExtraImages(project.images);
+        }
       } catch (error) {
         console.error("Error fetching project:", error);
         toast.error("Failed to load project details.");
@@ -74,6 +80,24 @@ const EditProjectPage = () => {
     setCoverPreview(URL.createObjectURL(file));
   };
 
+  const handleExtraImages = (e) => {
+    const files = Array.from(e.target.files);
+    const updatedImages = [...newExtraImages, ...files];
+    setNewExtraImages(updatedImages);
+    setNewExtraPreviews(updatedImages.map((f) => URL.createObjectURL(f)));
+  };
+
+  const removeNewExtraImage = (index) => {
+    const updatedImages = newExtraImages.filter((_, i) => i !== index);
+    setNewExtraImages(updatedImages);
+    setNewExtraPreviews(updatedImages.map((f) => URL.createObjectURL(f)));
+  };
+
+  const removeExistingExtraImage = (index) => {
+    const updatedImages = existingExtraImages.filter((_, i) => i !== index);
+    setExistingExtraImages(updatedImages);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim() || !form.description.trim()) {
@@ -91,6 +115,12 @@ const EditProjectPage = () => {
     if (coverImage) {
       formData.append('coverImage', coverImage);
     }
+    
+    // Append existing images we want to keep
+    formData.append('existingImages', JSON.stringify(existingExtraImages));
+
+    // Append newly added images
+    newExtraImages.forEach((file) => formData.append('extraImages', file));
 
     try {
       await updateProject(id, formData);
@@ -174,6 +204,53 @@ const EditProjectPage = () => {
                   <input type="file" accept="image/*" onChange={handleCoverImage} className="hidden" />
                 </label>
               </div>
+            </div>
+          </div>
+
+          {/* Extra Images */}
+          <div>
+            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Project Gallery (Optional)</label>
+            
+            {/* Grid for Previews */}
+            {(existingExtraImages.length > 0 || newExtraPreviews.length > 0) && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                
+                {/* Existing Images */}
+                {existingExtraImages.map((imgUrl, index) => (
+                  <div key={`existing-${index}`} className="relative h-24 rounded-md overflow-hidden border border-slate-200 group">
+                    <img src={imgUrl} alt={`Existing ${index}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeExistingExtraImage(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                  </div>
+                ))}
+
+                {/* New Images */}
+                {newExtraPreviews.map((preview, index) => (
+                  <div key={`new-${index}`} className="relative h-24 rounded-md overflow-hidden border border-green-400 border-2 group">
+                    <img src={preview} alt={`New ${index}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeNewExtraImage(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <span className="absolute bottom-0 left-0 bg-green-500 text-white text-[10px] font-bold px-1 py-0.5 rounded-tr-md">NEW</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="w-full">
+              <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-200 rounded-md cursor-pointer hover:border-slate-400 hover:bg-slate-50 transition-colors">
+                <span className="text-sm font-semibold text-slate-600">Add more images</span>
+                <input type="file" multiple accept="image/*" onChange={handleExtraImages} className="hidden" />
+              </label>
             </div>
           </div>
 
