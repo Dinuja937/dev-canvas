@@ -70,7 +70,7 @@ const StudentProfile = () => {
       <div className="w-full h-full flex flex-col md:flex-row gap-12 lg:gap-24">
 
         {/* Left Column: Profile Edit Form */}
-        <div className="w-full md:w-1/3 h-full overflow-y-auto pr-4 pb-16">
+        <div className="w-full md:w-1/3 h-full pr-4 pb-16">
           <div className="flex flex-col">
             <div className="flex items-center gap-4 mb-8">
               <img
@@ -146,7 +146,7 @@ const StudentProfile = () => {
         </div>
 
         {/* Right Column: Published Projects List */}
-        <div className="w-full md:w-2/3 h-full overflow-y-auto pr-4 pb-16">
+        <div className="w-full md:w-2/3 h-full overflow-y-auto no-scrollbar pr-4 pb-16">
           <div className="mb-10 pb-4 border-b border-slate-200">
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Latest Publications</h2>
           </div>
