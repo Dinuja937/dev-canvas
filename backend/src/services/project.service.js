@@ -67,7 +67,9 @@ export const getProjects = async (userId) => {
     if (userId) {
         query.studentId = userId;
     }
-    return await Project.find(query).populate('studentId', 'name email profilePic');
+    return await Project.find(query)
+        .sort({ createdAt: -1 })
+        .populate('studentId', 'name email profilePic');
 };
 
 export const getProjectById = async (projectId) => {
