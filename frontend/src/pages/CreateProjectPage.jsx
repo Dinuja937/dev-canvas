@@ -7,16 +7,17 @@ import { createProject } from '../api/project.api';
 const animatedBgStyles = `
   @import url('https://fonts.googleapis.com/css?family=Exo:400,700');
 
-  .area {
-    background: #4e54c8;
-    background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);
-    width: 100%;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 0;
-  }
+.area {
+  background: #E7C6FF; 
+  background: -webkit-linear-gradient(to bottom, #E7C6FF, #1a237e);
+  background: linear-gradient(to bottom, #E7C6FF, #1a237e);
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
 
   .circles {
     position: absolute;
