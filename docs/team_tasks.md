@@ -124,6 +124,4 @@ To prevent Git merge conflicts, the project has been structured using a decouple
    - *Like Project*: Recruiter click -> Controller -> Toggle DB record -> Emit `project:liked` event -> Create Notification.
 3. **API Documentation**: Document all request payloads, query parameters, and JSON response formats for backend routes.
 
-### Deployment Tasks
-1. **Build Scripts**: Configure environment variables (`MONGODB_URI`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`) for production.
-2. **Hosting Setup**: Set up staging deployments (e.g., Render/Railway for backend, Vercel/Netlify for Vite frontend).
+
