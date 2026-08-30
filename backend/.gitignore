@@ -20,6 +20,12 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# Certificates
+certs/
+*.pem
+*.key
+*.crt
+
 # Build output
 dist/
 build/

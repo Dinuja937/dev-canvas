@@ -5,3 +5,7 @@ notes.md
 node_modules/
 dist/
 build/
+certs/
+*.pem
+*.key
+*.crt
