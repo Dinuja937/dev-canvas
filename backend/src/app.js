@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import cookieParser from 'cookie-parser'
 import 'dotenv/config'
 import passport from './config/passport.js'
 import authRoutes from './routes/auth.routes.js'
@@ -13,14 +14,20 @@ import followRoutes from './routes/follow.routes.js'
 import notificationRoutes from "./routes/notification.routes.js";
 import userRoutes from './routes/user.routes.js';
 import "./events/listners.js"; // register all event listeners
+import { assertRequiredSecurityConfig } from './lib/security.js';
 
 
 const app = express()
+assertRequiredSecurityConfig();
 
 app.use(helmet())
-app.use(morgan('dev'))
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }))
-app.use(express.json())
+// Do not log query strings: OAuth authorization codes and other credentials can appear there.
+morgan.token('safe-url', (req) => req.path);
+app.use(morgan(':method :safe-url :status :res[content-length] - :response-time ms'))
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+app.use(cors({ origin: clientUrl, credentials: false, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], allowedHeaders: ['Authorization', 'Content-Type'] }))
+app.use(express.json({ limit: '100kb' }))
+app.use(cookieParser())
 app.use(passport.initialize())
 
 
@@ -39,7 +46,7 @@ app.use('/api/users', userRoutes);
 
 
 app.use((err, req, res, next) => {
-  console.error('[SERVER ERROR]', err.stack || err.message);
+  console.error('[SERVER ERROR]', err.name, err.message);
 
   const status = err.status || (err.name === 'MulterError' || err.message.includes('Invalid file format') ? 400 : 500);
   const message = process.env.NODE_ENV === 'production' && status === 500

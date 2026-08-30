@@ -1,16 +1,19 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../services/auth.service';
 import useAuthStore from '../store/authStore';
 
 const AuthCallbackPage = () => {
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const setToken = useAuthStore((state) => state.setToken);
 
   useEffect(() => {
-    const token = searchParams.get('token');
+    // Fragments are not sent in HTTP requests, preventing the bearer token from
+    // leaking through server, proxy, and referrer URL logs.
+    const token = new URLSearchParams(location.hash.slice(1)).get('token');
     if (token) {
+      window.history.replaceState(null, '', location.pathname);
       setToken(token);
       authService.getMe().then(() => {
         const user = useAuthStore.getState().user;
@@ -23,7 +26,7 @@ const AuthCallbackPage = () => {
     } else {
       navigate('/login');
     }
-  }, [searchParams, setToken, navigate]);
+  }, [location.hash, location.pathname, setToken, navigate]);
 
   return (
     <div style={{

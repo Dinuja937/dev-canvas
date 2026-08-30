@@ -34,89 +34,88 @@ function App() {
       <ToastContainer position="bottom-right" autoClose={4000} hideProgressBar={true} theme="colored" />
       <BrowserRouter>
         <ScrollToTop />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
-        {/* Protected Onboarding Route */}
-        <Route
-          path="/select-role"
-          element={
-            <ProtectedRoute>
-              <SelectRolePage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Catch-all Redirect */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/" element={<HomePage />} />
-          <Route path="/upload" element={<CreateProjectPage />} />
+          {/* Protected Onboarding Route */}
           <Route
-            path="/admin"
+            path="/select-role"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route
-            path="/upload"
-            element={
-              <ProtectedRoute allowedRoles={['STUDENT']}>
-                <CreateProjectPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/edit-project/:id"
-            element={
-              <ProtectedRoute allowedRoles={['STUDENT']}>
-                <EditProjectPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/projects/:id" element={<ProjectDetailPage />} />
-          <Route path="/students/:id" element={<StudentPublicProfilePage />} />
-          <Route
-            path="/my-portfolio"
-            element={
-              <ProtectedRoute allowedRoles={['STUDENT']}>
-                <ProfilePage />
+              <ProtectedRoute>
+                <SelectRolePage />
               </ProtectedRoute>
             }
           />
 
+          {/* Catch-all Redirect */}
           <Route
-            path="/liked-projects"
             element={
-              <ProtectedRoute allowedRoles={['RECRUITER']}>
-                <LikedProjectsPage />
+              <ProtectedRoute>
+                <Layout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/followed-students"
-            element={
-              <ProtectedRoute allowedRoles={['RECRUITER']}>
-                <FollowedStudentsPage />
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute allowedRoles={['STUDENT']}>
+                  <CreateProjectPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-project/:id"
+              element={
+                <ProtectedRoute allowedRoles={['STUDENT']}>
+                  <EditProjectPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/projects/:id" element={<ProjectDetailPage />} />
+            <Route path="/students/:id" element={<StudentPublicProfilePage />} />
+            <Route
+              path="/my-portfolio"
+              element={
+                <ProtectedRoute allowedRoles={['STUDENT']}>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Catch-all Redirect inside layout to prevent navbar unmounting */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+            <Route
+              path="/liked-projects"
+              element={
+                <ProtectedRoute allowedRoles={['RECRUITER']}>
+                  <LikedProjectsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/followed-students"
+              element={
+                <ProtectedRoute allowedRoles={['RECRUITER']}>
+                  <FollowedStudentsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch-all Redirect inside layout to prevent navbar unmounting */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }

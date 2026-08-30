@@ -1,24 +1,16 @@
 import User from '../models/User.js';
 import Project from '../models/Project.js';
 import Follower from '../models/Follower.js';
+import { optionalText, parseTechnologies, limits } from '../lib/validation.js';
 
 export const updateUserService = async (userId, data) => {
-  const { bio, technologies, location, institute, contactNumber } = data;
-  
-  let techArray = [];
-  if (typeof technologies === 'string') {
-    techArray = technologies.split(',').map((t) => t.trim()).filter((t) => t);
-  } else if (Array.isArray(technologies)) {
-    techArray = technologies;
-  }
-
   const updateFields = {
-    bio,
-    technologies: techArray,
-    location,
-    institute,
+    bio: optionalText(data.bio, 'Bio', limits.bio),
+    technologies: parseTechnologies(data.technologies),
+    location: optionalText(data.location, 'Location', limits.location),
+    institute: optionalText(data.institute, 'Institute', limits.institute),
   };
-  if (contactNumber !== undefined) updateFields.contactNumber = contactNumber;
+  if (data.contactNumber !== undefined) updateFields.contactNumber = optionalText(data.contactNumber, 'Contact number', limits.contactNumber);
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,

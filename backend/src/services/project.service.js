@@ -1,6 +1,17 @@
 import Project from '../models/Project.js';
 import eventBus from '../events/eventBus.js';
 import cloudinary from '../lib/cloudinary.js';
+import { optionalHttpUrl, parseTags, requiredText, limits } from '../lib/validation.js';
+
+const projectFields = (data, { partial = false } = {}) => {
+    const fields = {};
+    if (!partial || data.title !== undefined) fields.title = requiredText(data.title, 'Title', limits.title);
+    if (!partial || data.description !== undefined) fields.description = requiredText(data.description, 'Description', limits.description);
+    if (!partial || data.githubUrl !== undefined) fields.githubUrl = optionalHttpUrl(data.githubUrl, 'GitHub URL');
+    if (!partial || data.demoUrl !== undefined) fields.demoUrl = optionalHttpUrl(data.demoUrl, 'Demo URL');
+    if (!partial || data.tags !== undefined) fields.tags = parseTags(data.tags);
+    return fields;
+};
 
 export const uploadToCloudinary = async (buffer, folder) => {
     return new Promise((resolve, reject) => {
@@ -16,6 +27,7 @@ export const uploadToCloudinary = async (buffer, folder) => {
 };
 
 export const createProject = async (projectData, files, user) => {
+    const fields = projectFields(projectData);
     let coverImageUrl = '';
     let extraImageUrls = [];
 
@@ -34,19 +46,8 @@ export const createProject = async (projectData, files, user) => {
         );
     }
 
-    let tagsArray = [];
-    if (projectData.tags) {
-        tagsArray = typeof projectData.tags === 'string'
-            ? projectData.tags.split(',').map((t) => t.trim()).filter(Boolean)
-            : projectData.tags;
-    }
-
     const project = new Project({
-        title: projectData.title,
-        description: projectData.description,
-        githubUrl: projectData.githubUrl,
-        demoUrl: projectData.demoUrl,
-        tags: tagsArray,
+        ...fields,
         studentId: user.id,
         coverImage: coverImageUrl,
         images: extraImageUrls,
@@ -97,6 +98,10 @@ export const updateProject = async (projectId, updateData, files, userId) => {
         } catch (e) {
             updatedImages = Array.isArray(updateData.existingImages) ? updateData.existingImages : [updateData.existingImages];
         }
+        if (!Array.isArray(updatedImages) || updatedImages.some((image) => typeof image !== 'string') ||
+            updatedImages.some((image) => !project.images.includes(image))) {
+            throw new Error('Invalid existing images');
+        }
     }
 
     if (files?.extraImages?.length) {
@@ -109,16 +114,7 @@ export const updateProject = async (projectId, updateData, files, userId) => {
     }
     project.images = updatedImages;
 
-    const { title, description, githubUrl, demoUrl, tags } = updateData;
-    if (title) project.title = title;
-    if (description) project.description = description;
-    if (githubUrl !== undefined) project.githubUrl = githubUrl;
-    if (demoUrl !== undefined) project.demoUrl = demoUrl;
-    if (tags !== undefined) {
-        project.tags = typeof tags === 'string'
-            ? tags.split(',').map((t) => t.trim()).filter(Boolean)
-            : tags;
-    }
+    Object.assign(project, projectFields(updateData, { partial: true }));
 
     await project.save();
     return project;

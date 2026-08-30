@@ -2,17 +2,27 @@
 import jwt from 'jsonwebtoken'
 import User from '../models/User.js'
 import { getAsgardeoConfig, verifyAsgardeoToken } from '../config/asgardeo.js'
+import { createOidcState, createPkceChallenge, createPkceVerifier, getJwtSecret, safeEqual, securityLog } from '../lib/security.js'
+import { optionalHttpUrl, requiredText, limits } from '../lib/validation.js'
 
 export const initiateAsgardeoLogin = (req, res) => {
     const config = getAsgardeoConfig();
-    const { prompt } = req.query;
+    const prompt = req.query.prompt === 'select_account' ? 'select_account' : 'login';
+    const state = createOidcState();
+    const verifier = createPkceVerifier();
+    const secure = process.env.NODE_ENV === 'production';
+    res.cookie('oidc_state', state, { httpOnly: true, secure, sameSite: 'lax', maxAge: 10 * 60 * 1000, path: '/api/auth/asgardeo' });
+    res.cookie('oidc_pkce', verifier, { httpOnly: true, secure, sameSite: 'lax', maxAge: 10 * 60 * 1000, path: '/api/auth/asgardeo' });
 
     const params = new URLSearchParams({
         response_type: 'code',
         client_id: config.clientId,
         redirect_uri: config.redirectUri,
         scope: config.scopes,
-        prompt: prompt || 'login', // Force account login/prompt so user switching works on logout
+        prompt,
+        state,
+        code_challenge: createPkceChallenge(verifier),
+        code_challenge_method: 'S256',
     });
     res.redirect(`${config.authorizationEndpoint}?${params.toString()}`);
 };
@@ -152,7 +162,7 @@ export const extractAsgardeoClaims = (payload = {}, userinfo = {}) => {
 
 export const handleAsgardeoCallback = async (req, res, next) => {
     try {
-        const { code, error, error_description } = req.query;
+        const { code, error, error_description, state } = req.query;
         const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
 
         if (error) {
@@ -160,7 +170,8 @@ export const handleAsgardeoCallback = async (req, res, next) => {
             return res.redirect(`${clientUrl}/login?error=${encodeURIComponent(error_description || error)}`);
         }
 
-        if (!code) {
+        if (!code || !safeEqual(state, req.cookies?.oidc_state) || !req.cookies?.oidc_pkce) {
+            securityLog('auth.oidc_callback_rejected', { reason: !code ? 'missing_code' : 'invalid_state' });
             return res.redirect(`${clientUrl}/login?error=Missing authorization code`);
         }
 
@@ -171,7 +182,10 @@ export const handleAsgardeoCallback = async (req, res, next) => {
             redirect_uri: config.redirectUri,
             client_id: config.clientId,
             client_secret: config.clientSecret,
+            code_verifier: req.cookies.oidc_pkce,
         });
+        res.clearCookie('oidc_state', { path: '/api/auth/asgardeo' });
+        res.clearCookie('oidc_pkce', { path: '/api/auth/asgardeo' });
 
         const tokenResponse = await fetch(config.tokenEndpoint, {
             method: 'POST',
@@ -182,8 +196,7 @@ export const handleAsgardeoCallback = async (req, res, next) => {
         });
 
         if (!tokenResponse.ok) {
-            const errText = await tokenResponse.text();
-            console.error('Token exchange failed:', errText);
+            securityLog('auth.oidc_token_exchange_failed', { status: tokenResponse.status });
             return res.redirect(`${clientUrl}/login?error=Failed to exchange token with Asgardeo`);
         }
 
@@ -192,17 +205,16 @@ export const handleAsgardeoCallback = async (req, res, next) => {
 
         let payload = null;
         try {
-            payload = await verifyAsgardeoToken(id_token || access_token);
+            if (!id_token) throw new Error('Missing ID token');
+            payload = await verifyAsgardeoToken(id_token);
         } catch (vErr) {
-            console.warn('Asgardeo token verification warning, decoding payload fallback:', vErr.message);
-            payload = jwt.decode(id_token || access_token);
+            securityLog('auth.oidc_token_rejected', { reason: vErr.message });
+            return res.redirect(`${clientUrl}/login?error=Invalid identity token from Asgardeo`);
         }
 
         if (!payload) {
             return res.redirect(`${clientUrl}/login?error=Invalid identity token from Asgardeo`);
         }
-
-        console.log('=== ASGARDEO DEBUG: ID TOKEN PAYLOAD ===', JSON.stringify(payload, null, 2));
 
         // Fetch UserInfo claims using access token for extra claims (phone_number, username, given_name, family_name)
         let userinfo = {};
@@ -213,9 +225,8 @@ export const handleAsgardeoCallback = async (req, res, next) => {
                 });
                 if (userInfoRes.ok) {
                     userinfo = await userInfoRes.json();
-                    console.log('=== ASGARDEO DEBUG: USERINFO RESPONSE ===', JSON.stringify(userinfo, null, 2));
                 } else {
-                    console.error('=== ASGARDEO DEBUG: USERINFO FETCH FAILED ===', userInfoRes.status, await userInfoRes.text());
+                    securityLog('auth.oidc_userinfo_failed', { status: userInfoRes.status });
                 }
             } catch (uErr) {
                 console.warn('Asgardeo UserInfo fetch warning:', uErr.message);
@@ -225,8 +236,6 @@ export const handleAsgardeoCallback = async (req, res, next) => {
         const claims = extractAsgardeoClaims(payload, userinfo);
         const { sub, email, username, name, contactNumber, profilePic } = claims;
         const normalizedEmail = email ? email.toLowerCase().trim() : '';
-
-        console.log('=== ASGARDEO EXTRACTED CLAIMS ===', claims);
 
         // 1. Find by asgardeoId FIRST to ensure we update the exact existing Asgardeo user
         let user = await User.findOne({ asgardeoId: sub });
@@ -341,11 +350,11 @@ export const handleAsgardeoCallback = async (req, res, next) => {
                 isNewUser: user.isNewUser,
                 sub: user.asgardeoId,
             },
-            process.env.JWT_SECRET || 'fallback_secret',
+            getJwtSecret(),
             { expiresIn: '7d' }
         );
 
-        res.redirect(`${clientUrl}/auth/callback?token=${token}`);
+        res.redirect(`${clientUrl}/auth/callback#token=${encodeURIComponent(token)}`);
     } catch (err) {
         next(err);
     }
@@ -367,12 +376,12 @@ export const handleGoogleCallback = (req, res) => {
             role: user.role,
             isNewUser: user.isNewUser,
         },
-        process.env.JWT_SECRET,
+        getJwtSecret(),
         { expiresIn: '7d' }
 
     )
 
-    res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`)
+    res.redirect(`${process.env.CLIENT_URL}/auth/callback#token=${encodeURIComponent(token)}`)
 }
 
 export const selectRole = async (req, res, next) => {
@@ -383,11 +392,15 @@ export const selectRole = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Invalid role' })
         }
 
-        const user = await User.findByIdAndUpdate(
-            req.user.id,
+        const user = await User.findOneAndUpdate(
+            { _id: req.user.id, isNewUser: true },
             { role, isNewUser: false },
             { new: true }
         )
+
+        if (!user) {
+            return res.status(409).json({ success: false, message: 'Role has already been selected' })
+        }
 
         // issue a fresh token with updated role
         const token = jwt.sign(
@@ -398,7 +411,7 @@ export const selectRole = async (req, res, next) => {
                 role: user.role,
                 isNewUser: false,
             },
-            process.env.JWT_SECRET,
+        getJwtSecret(),
             { expiresIn: '7d' }
         )
 
@@ -421,11 +434,8 @@ export const getMe = async (req, res, next) => {
 
 export const updateProfile = async (req, res, next) => {
     try {
-        const { name, profilePic } = req.body;
-
-        if (!name || name.trim() === '') {
-            return res.status(400).json({ success: false, message: 'Name is required' });
-        }
+        const name = requiredText(req.body.name, 'Name', limits.name);
+        const profilePic = optionalHttpUrl(req.body.profilePic, 'Profile picture URL');
 
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -446,7 +456,7 @@ export const updateProfile = async (req, res, next) => {
                 role: user.role,
                 isNewUser: user.isNewUser,
             },
-            process.env.JWT_SECRET,
+        getJwtSecret(),
             { expiresIn: '7d' }
         );
 

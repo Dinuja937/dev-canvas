@@ -8,7 +8,8 @@ import {
   updateProject,
   deleteProject,
 } from '../controllers/project.controller.js';
-import authMiddleware from '../middleware/auth.middleware.js';
+import authMiddleware, { optionalAuthMiddleware } from '../middleware/auth.middleware.js';
+import roleMiddleware from '../middleware/role.middleware.js';
 
 const upload = multer({ 
   storage: multer.memoryStorage(),
@@ -30,11 +31,11 @@ const projectUpload = upload.fields([
 
 const router = express.Router();
 
-router.post('/', authMiddleware, projectUpload, createProject);
-router.get('/', getProjects);
+router.post('/', authMiddleware, roleMiddleware('STUDENT'), projectUpload, createProject);
+router.get('/', optionalAuthMiddleware, getProjects);
 router.get('/:id', getProjectById);
-router.put('/:id', authMiddleware, projectUpload, updateProject);
-router.delete('/:id', authMiddleware, deleteProject);
+router.put('/:id', authMiddleware, roleMiddleware('STUDENT'), projectUpload, updateProject);
+router.delete('/:id', authMiddleware, roleMiddleware('STUDENT'), deleteProject);
 
 export default router;
 
