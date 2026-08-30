@@ -2,10 +2,12 @@ import 'dotenv/config'
 import app from './app.js'
 import connectDB from './lib/db.js'
 import './lib/cloudinary.js' 
+import { assertRequiredSecurityConfig } from './lib/security.js'
 
 const PORT = process.env.PORT || 3000
 
 async function main() {
+    assertRequiredSecurityConfig()
     await connectDB()
 
     app.listen(PORT, () => {

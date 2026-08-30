@@ -126,6 +126,7 @@ export const verifyAsgardeoToken = async (token) => {
     const verifyOptions = {
         algorithms: ['RS256'],
         clockTolerance: 60, // 60 seconds tolerance for clock skew
+        issuer: config.issuer,
     };
 
     if (config.clientId) {

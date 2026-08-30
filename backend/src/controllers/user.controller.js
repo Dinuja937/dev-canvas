@@ -1,4 +1,5 @@
 import { updateUserService, getUserByIdService } from '../services/user.service.js';
+import mongoose from 'mongoose';
 
 export const updateProfile = async (req, res) => {
   try {
@@ -10,12 +11,15 @@ export const updateProfile = async (req, res) => {
 
     res.json(updatedUser);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
 export const getUserById = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid user ID format' });
+    }
     const result = await getUserByIdService(req.params.id);
 
     if (!result) {

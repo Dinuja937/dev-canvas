@@ -2,17 +2,17 @@ import { create } from 'zustand';
 
 const useAuthStore = create((set) => ({
   user: null,
-  token: localStorage.getItem('token') || null,
-  isAuthenticated: !!localStorage.getItem('token'),
+  token: sessionStorage.getItem('token') || null,
+  isAuthenticated: !!sessionStorage.getItem('token'),
   loading: true,
 
   setUser: (user) => set({ user }),
   setToken: (token) => {
     if (token) {
-      localStorage.setItem('token', token);
+      sessionStorage.setItem('token', token);
       set({ token, isAuthenticated: true });
     } else {
-      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
       set({ token: null, isAuthenticated: false, user: null });
     }
   },
@@ -21,7 +21,7 @@ const useAuthStore = create((set) => ({
   
   // Basic sync reset
   resetAuth: () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     set({ user: null, token: null, isAuthenticated: false, loading: false });
   }
 }));

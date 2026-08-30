@@ -1,4 +1,6 @@
 import * as adminService from '../services/admin.service.js';
+import mongoose from 'mongoose';
+import { securityLog } from '../lib/security.js';
 
 export const getAllUsers = async (req, res, next) => {
     try {
@@ -20,7 +22,11 @@ export const getAllProjects = async (req, res, next) => {
 
 export const deleteProject = async (req, res, next) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ success: false, message: 'Invalid project ID format' });
+        }
         await adminService.removeProject(req.params.id);
+        securityLog('admin.project_deleted', { actorId: String(req.user.id), projectId: req.params.id });
         return res.status(200).json({ success: true, message: 'Project deleted successfully' });
     } catch (err) {
         if (err.message === 'Project not found') {
@@ -32,7 +38,11 @@ export const deleteProject = async (req, res, next) => {
 
 export const toggleUserStatus = async (req, res, next) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ success: false, message: 'Invalid user ID format' });
+        }
         const user = await adminService.toggleUserStatus(req.params.id, req.user.id);
+        securityLog('admin.user_status_changed', { actorId: String(req.user.id), targetUserId: req.params.id, isDisabled: user.isDisabled });
         return res.status(200).json({ success: true, message: `User ${user.isDisabled ? 'disabled' : 'enabled'} successfully`, data: user });
     } catch (err) {
         if (err.message === 'User not found') {

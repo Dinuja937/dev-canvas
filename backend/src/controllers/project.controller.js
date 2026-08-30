@@ -6,7 +6,7 @@ export const createProject = async (req, res) => {
     const project = await projectService.createProject(req.body, req.files, req.user);
     res.status(201).json(project);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -29,7 +29,7 @@ export const getProjects = async (req, res) => {
     const projects = await projectService.getProjects(targetUserId);
     res.json(projects);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
