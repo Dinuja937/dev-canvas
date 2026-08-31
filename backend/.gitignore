@@ -24,3 +24,6 @@ Thumbs.db
 dist/
 build/
 /src/generated/prisma
+
+localhost-key.pem
+localhost.pem
