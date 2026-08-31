@@ -1,44 +1,139 @@
-# OWASP Top 10 Security Assessment & Hardening Report
+# 🛡️ DevCanvas — Security Documentation
 
-This document details the security review, vulnerability assessment, and remediation controls implemented in **DevCanvas** for Assessment 2.
-
----
-
-## OWASP Top 10 Vulnerability Assessment Matrix
-
-| OWASP Category | Finding / Risk Description | Severity | Remediation Control Implemented | Verification Method | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **A01: Broken Access Control** | IDOR risks on project update/delete routes; missing format checks on MongoDB ObjectIds. | **High** | Added `mongoose.Types.ObjectId.isValid` validation and strict server-side ownership verification (`project.studentId === req.user.id`). Added `GET /api/projects?owner=me` resolving identity strictly from server token. | Automated test: Attempt updating project ID owned by another student -> HTTP 403 Forbidden. | **PASSED** |
-| **A02: Cryptographic Failures** | Secrets exposure risk if hardcoded in source; plain token verification without IdP checks. | **High** | Integrated Asgardeo OIDC with RS256 JWKS signature verification. Enforced strict environment variable separation via `.env` and `.gitignore`. | Network inspection & source code secret scanning. | **PASSED** |
-| **A03: Injection** | Potential NoSQL injection payloads via unsanitized query parameters or dynamic Mongoose filters. | **High** | Enforced type validation and explicit string conversion on query parameters (`req.params.id`, `req.query.userId`). Validated ObjectIds before query execution. | Automated test: Send malformed string `invalid-objectid-999` -> HTTP 400 Bad Request. | **PASSED** |
-| **A04: Insecure Design** | Authentication architecture mixing unverified custom JWTs with OAuth redirect without cryptographic key verification. | **Medium** | Migrated authentication to OIDC standard using Asgardeo as single primary IdP with RS256 public key verification via JWKS. | Verification of token flow and claims validation. | **PASSED** |
-| **A05: Security Misconfiguration** | Verbose error responses leaking internal stack traces in production; missing security headers. | **Medium** | Enhanced Express error middleware in `app.js` to suppress internal stack traces in production responses. Configured `helmet` security headers. | Automated test: Trigger 500 error -> Verify stack trace omitted from JSON response. | **PASSED** |
-| **A06: Vulnerable Components** | Outdated or vulnerable third-party npm dependencies. | **Medium** | Performed `npm audit` check. Dependencies updated to stable Node 20 / Express 5 compatible versions. | Execution of `npm audit`. | **PASSED** |
-| **A07: Identification & Authentication Failures** | Lack of cryptographic token validation (`iss`, `aud`, `exp`). | **High** | `authMiddleware` verifies JWT signature, issuer (`iss`), audience (`aud`), and expiration (`exp`) with clock skew tolerance. | Automated test: Send missing or forged token -> HTTP 401 Unauthorized. | **PASSED** |
-| **A08: Software & Data Integrity Failures** | Upload endpoints accepting arbitrary file MIME types without validation. | **High** | Applied strict Multer `fileFilter` restricting uploads exclusively to `image/jpeg`, `image/png`, and `image/webp` with 5MB size limit. | Automated test: Upload non-image format -> HTTP 400 Bad Request. | **PASSED** |
-| **A09: Security Logging & Monitoring** | Lack of structured request and security audit logs. | **Low** | Configured `morgan` HTTP logger and console audit logging for administrative user suspension and project deletion actions. | Log output inspection. | **PASSED** |
-| **A10: Server-Side Request Forgery (SSRF)** | Server fetching arbitrary external user-supplied image URLs. | **Low** | Verified project upload architecture streams file buffers directly from memory to Cloudinary without making server-initiated outbound HTTP requests to user-supplied URLs. | Code inspection of `project.service.js`. | **PASSED** |
+> **Assessment 2 Documentation**  
+> This document summarizes the security controls implemented in DevCanvas for Assessment 2, including authentication, authorization, input validation, secure file handling, server security, logging, and OWASP Top 10 assessment.
 
 ---
 
-## Test Verification Summary
+## 1. Implemented Security Controls
 
-Automated testing executed via `backend/scripts/verify-security.js`:
+### 🔑 Authentication & Identity
+* Integrated **Asgardeo OIDC** using the authorization-code flow.
+* Implemented **OAuth State** and **PKCE (S256)** protection.
+* Used **HttpOnly cookies** for OAuth state and PKCE values.
+* Verified Asgardeo ID tokens using **RS256** and **JWKS** with `kid` matching.
+* Validated `iss`, `aud`, and `exp` claims with clock-skew tolerance.
+* Rejected missing, malformed, invalid, and forged bearer tokens.
+* Mapped authenticated Asgardeo users to application accounts.
+* Backend application authentication uses signed **HS256 JWTs**.
 
-```text
-====================================================
-   DEVCANVAS ASSESSMENT 2 — SECURITY & API TESTS    
-====================================================
+### 🛡️ Authorization & Access Control
+* Implemented backend **RBAC** for `ADMIN`, `STUDENT`, and `RECRUITER` roles.
+* Protected administrative operations using server-side role checks.
+* Restricted project mutations according to the authenticated user's role.
+* Implemented server-side project ownership verification for update/delete operations.
+* Implemented `owner=me` project retrieval using the authenticated server identity.
+* Validated MongoDB ObjectIds before protected database operations.
 
-[PASS] Backend Health Check (/api/health)
-[PASS] Unauthenticated POST /api/projects returns HTTP 401
-[PASS] Forged Bearer Token on /api/auth/me returns HTTP 401
-[PASS] Invalid ObjectId in URL parameter returns HTTP 400
-[PASS] Public GET /api/projects returns HTTP 200
-[PASS] Asgardeo OIDC Endpoint Configuration Validated
-[PASS] Database Schema: User.asgardeoId field present & indexed
+### 💉 Input & Injection Protection
+* Validated route and query parameters.
+* Applied allowlisted and type-checked project/profile inputs.
+* Explicitly converted expected string parameters.
+* Rejected malformed MongoDB ObjectIds with `400 Bad Request`.
+* Applied targeted validation to reduce NoSQL injection risks.
 
-====================================================
- SUMMARY: 7 PASSED, 0 FAILED
-====================================================
+### 📁 Secure File Uploads
+* Used **Multer memory storage** for project uploads.
+* Restricted uploads to:
+  * `image/jpeg`
+  * `image/png`
+  * `image/webp`
+* Enforced a **5 MB** file-size limit.
+* Rejected unsupported MIME types.
+* Uploaded accepted image buffers directly to Cloudinary.
+* The project upload flow does not fetch arbitrary user-supplied URLs.
+
+### 🖥️ Server & Configuration Security
+* Enabled **Helmet** security headers.
+* Restricted **CORS** to the configured client origin.
+* Applied JSON request-size limits.
+* Added production error handling with generic central `500` responses.
+* Stored service secrets/configuration in environment variables.
+* `.env` files are excluded from Git.
+* Local HTTPS certificate/private-key files are excluded from Git.
+
+### 📊 Logging & Monitoring
+* Configured **Morgan** HTTP request logging.
+* Uses a query-free URL format to avoid logging query-string data.
+* Added **JSON security audit logging** for:
+  * Administrative user suspension.
+  * Administrative project deletion.
+  * OIDC authentication rejection/failure events.
+
+---
+
+## 2. OWASP Top 10 Assessment
+
+| OWASP Category | Severity | Finding / Risk | Implemented Security Control | Verification |
+| :--- | :--- | :--- | :--- | :--- |
+| **A01: Broken Access Control** | `High` | IDOR risk on project modification and unauthorized resource access. | RBAC, server-side project ownership verification, ObjectId validation, and authenticated `owner=me` resolution. | Code review and authorization testing. |
+| **A02: Cryptographic Failures** | `High` | Risk of weak token verification or exposed secrets. | Asgardeo RS256/JWKS verification and environment-based secret configuration. | Authentication/configuration review. |
+| **A03: Injection** | `High` | Potential NoSQL injection through unvalidated parameters and filters. | ObjectId validation, type validation, explicit conversion, and allowlisted inputs. | Malformed input/ObjectId testing. |
+| **A04: Insecure Design** | `Medium` | Authentication flow required protection against OAuth manipulation and token trust issues. | OIDC authorization-code flow, State, PKCE, and cryptographic ID-token verification. | Authentication flow review. |
+| **A05: Security Misconfiguration** | `Medium` | Missing security headers and potential internal error exposure. | Helmet, restricted CORS, JSON limits, environment protection, and production error handling. | Configuration/error-handling review. |
+| **A06: Vulnerable Components** | `Medium` | React Router dependencies contained known vulnerabilities. | Updated `react-router` and `react-router-dom` from `7.18.0` → `7.18.2`. Backend and frontend npm audit report 0 vulnerabilities. | Dependency audit. |
+| **A07: Identification & Authentication Failures** | `High` | Invalid or forged authentication tokens could be accepted. | RS256/JWKS ID-token verification with `iss`, `aud`, and `exp` validation; invalid bearer tokens rejected. | Authentication and token validation testing. |
+| **A08: Software & Data Integrity Failures** | `High` | Upload endpoints could accept unsupported file types. | Multer MIME filtering and 5 MB size restriction with controlled Cloudinary buffer uploads. | File-upload validation testing. |
+| **A09: Security Logging & Monitoring Failures** | `Low` | Insufficient request and security event logging. | Morgan HTTP logging and JSON security audit events. | Log inspection. |
+| **A10: Server-Side Request Forgery (SSRF)** | `Low` | Risk of server fetching arbitrary user-supplied URLs. | Project uploads use file buffers; no project-upload server-side fetching of user-supplied URLs. | Upload-service code inspection. |
+
+---
+
+## 3. Dependency Security Verification
+
+Production dependencies were audited using:
+
+```bash
+npm audit --omit=dev --audit-level=low
 ```
+
+### Backend
+* **0 vulnerabilities**
+
+### Frontend
+The identified React Router vulnerabilities were resolved:
+* `react-router`: `7.18.0` → `7.18.2`
+* `react-router-dom`: `7.18.0` → `7.18.2`
+
+**Final result:**
+```text
+found 0 vulnerabilities
+```
+The frontend production build also completed successfully after the dependency update.
+
+> **Status:** `A06 Status: RESOLVED`
+
+---
+
+## 4. Security Verification
+
+The repository includes:
+```text
+backend/scripts/verify-security.js
+```
+
+Additional backend security-related unit tests completed with:
+* **3 passed**
+* **0 failed**
+
+The recorded `verify-security.js` run could not connect to the expected local server for its HTTP checks. Therefore, those failed connection checks are not presented as successful endpoint-security evidence.
+
+Security controls were also verified through source-code/configuration review and dependency auditing.
+
+---
+
+## 📝 Security Summary
+
+DevCanvas implements security controls covering:
+* OIDC authentication and PKCE.
+* RS256/JWKS token verification.
+* RBAC and server-side ownership checks.
+* Input and ObjectId validation.
+* Secure file-upload restrictions.
+* Helmet and CORS configuration.
+* Environment-based secrets.
+* Security and request logging.
+* Dependency vulnerability management.
+* OWASP Top 10 security assessment.
+
+**Final dependency audit:** `0 production vulnerabilities`.
