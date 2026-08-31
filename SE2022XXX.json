@@ -1,9 +1,0 @@
-{
-  "sid": "SE/2022/026",
-  "name": "A.G.R.M.D.C.Ranaweera",
-  "app-url": "https://localhost:5173",
-  "git": "https://github.com/Dinuja937/dev-canvas",
-  "blog": [
-    "https://medium.com/@dinujachamodi/securing-devcanvas-my-experience-with-oidc-asgardeo-rbac-and-owasp-8d7b86f47fa3?postPublishedType=initial"
-  ]
-}
