@@ -1,191 +1,388 @@
-# 🎨 DevCanvas — Student Project Showcase Portal (Assessment 2 Enhanced)
+# 🎨 DevCanvas — Student Project Showcase Portal
 
-![MERN Stack](https://img.shields.io/badge/Stack-MERN-blue?style=for-the-badge)
-![Vite](https://img.shields.io/badge/Bundler-Vite-purple?style=for-the-badge)
-![OIDC](https://img.shields.io/badge/Auth-Asgardeo_OIDC-green?style=for-the-badge)
-![Security](https://img.shields.io/badge/Security-OWASP_Top_10_Hardened-red?style=for-the-badge)
-
-**DevCanvas** is a modern, secure web portal designed to bridge the gap between computing students and tech recruiters. Students build rich project portfolios to showcase their innovations, while recruiters and faculty discover and interact with talent.
-
----
-
-## 🔒 Assessment 2 Security & OIDC Enhancements
-
-This project has been enhanced according to the **Assessment 2: Secure Web Application Development** guidelines:
-
-1. **OIDC Authentication with Asgardeo**: Full OpenID Connect integration using Asgardeo as the primary Identity Provider (IdP).
-2. **Access Token Validation**: Cryptographic signature verification using Asgardeo's JWKS (`RS256`), verifying issuer (`iss`), audience (`aud`), and expiration (`exp`).
-3. **Role-Based Access Control (RBAC)**: Strict role enforcement (`STUDENT`, `RECRUITER`, `ADMIN`) via `roleMiddleware`.
-4. **Ownership & IDOR Protection**: Server-derived identity enforcement. Project creation, editing, and deletion verify ownership (`project.studentId === req.user.id`).
-5. **NoSQL Injection & Input Validation**: Validation of MongoDB ObjectIds (`mongoose.Types.ObjectId.isValid`) across all route parameters.
-6. **File Upload Security**: Multer storage restricted strictly to valid image MIME types (`image/jpeg`, `image/png`, `image/webp`) with 5MB size limits.
-7. **OWASP Top 10 Hardening**: Production error message sanitization, Helmet security headers, CORS origin restrictions, and secret isolation.
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Asgardeo](https://img.shields.io/badge/Asgardeo-FF7300?style=for-the-badge&logo=wso2&logoColor=white)
+![Security](https://img.shields.io/badge/Security-OIDC_%7C_RBAC_%7C_OWASP-blue?style=for-the-badge&logo=shield)
 
 ---
 
-## 📋 Assessment Functionality Mapping
+## 📌 About the Project
 
-| Official Assessment Requirement | DevCanvas Domain Mapping | Technical Implementation |
-| :--- | :--- | :--- |
-| **Stall Vendor** | **Student / Project Creator** | User with role `STUDENT` |
-| **Vendor Profile** | **Student Profile** | `User` model (`name`, `email`, `profilePic`, `bio`, `technologies`, `location`, `institute`) |
-| **Stall Reservation Request** | **Student Project Submission** | `Project` model (`title`, `description`, `githubUrl`, `demoUrl`, `tags`, `coverImage`, `images`) |
-| **View Vendor's Own Reservations** | **Student's Own Projects** | `GET /api/projects?owner=me` (filtered server-side by authenticated `req.user.id`) |
-| **Exhibition Organizer** | **Admin / Portal Organizer** | User with role `ADMIN` |
-| **Organizer Management** | **Admin Project & User Management** | `/api/admin/projects` (view/delete submissions), `/api/admin/users` (manage/disable users) |
+DevCanvas is a Student Project Showcase Portal that allows students to create and manage project portfolios while enabling other users to discover and view student projects.
+
+The existing Student Project Showcase Portal was enhanced for the Information Security module assignment by implementing additional security mechanisms including OIDC authentication, access-token validation, role-based access control, resource ownership protection, input validation, secure file uploads, and secure configuration.
 
 ---
 
-## 🛠️ Local Setup & Deployment
+## ✨ Features
+
+### 👨‍🎓 Student
+* Create and manage student profiles
+* Create and manage project portfolios
+* Add project descriptions and technologies
+* Add GitHub and demo links
+* Upload project images
+* View personal projects
+
+### 🔍 Project Discovery
+* Browse student projects
+* View project details
+* View student information and technologies
+* Access project GitHub and demo links
+
+### 👨‍💼 Administration
+* Manage users
+* View projects
+* Delete projects
+* Manage user access
+
+---
+
+## 🔐 Security Enhancements
+
+The main focus of this version was to improve the security of the original DevCanvas application according to the security requirements of the Information Security module assignment.
+
+### 1. OIDC Authentication with Asgardeo
+The application uses Asgardeo as the Identity Provider (IdP) with OpenID Connect (OIDC) for user authentication.
+The application supports secure:
+* User login
+* User logout
+* Authenticated user identification
+
+Authentication is handled through the OIDC authentication flow rather than implementing authentication credentials directly within the application.
+
+### 2. Authenticated User Information
+User information is obtained from the authenticated identity provided by Asgardeo.
+The authenticated user's identity is used by the backend when performing protected operations instead of relying on user identity information supplied by the client.
+This ensures that protected operations are associated with the authenticated user.
+
+### 3. Access Token Validation
+Access tokens obtained from the Identity Provider are validated by the backend before protected resources can be accessed.
+Token validation includes:
+* JWT signature verification using Asgardeo JWKS
+* RS256 signature verification
+* Issuer (`iss`) validation
+* Audience (`aud`) validation
+* Expiration (`exp`) validation
+
+The validated access token is used to identify and authorize the authenticated user.
+
+### 4. Role-Based Access Control (RBAC)
+Access to protected functionality is controlled according to user roles.
+The application supports the following roles:
+* `STUDENT`
+* `RECRUITER`
+* `ADMIN`
+
+The backend verifies the authenticated user's role before allowing access to protected endpoints.
+This prevents users from accessing functionality that is not permitted for their assigned role.
+
+### 5. Ownership and IDOR Protection
+The backend verifies resource ownership before allowing users to modify or delete their projects.
+The authenticated user's identity is obtained from the server-side authentication context rather than trusting a user ID supplied by the client.
+This helps prevent Insecure Direct Object Reference (IDOR) attacks by ensuring that users cannot modify or delete resources belonging to other users.
+
+### 6. Input Validation and Injection Protection
+User-supplied identifiers are validated before being used in database operations.
+MongoDB ObjectIds are checked for validity and invalid identifiers are rejected before database queries are performed.
+This reduces the risk of malformed or malicious input being used in MongoDB database operations.
+
+### 7. Secure File Uploads
+Project image uploads are restricted by file type and file size.
+Supported image formats are:
+* JPEG
+* PNG
+* WebP
+
+The maximum upload size is 10 MB.
+Uploaded images are stored using Cloudinary rather than being stored directly in the application server.
+
+### 8. Security Headers and CORS
+The backend uses Helmet to provide security-related HTTP headers.
+CORS is configured to restrict cross-origin requests to the configured frontend origin.
+These controls help reduce security risks associated with insecure HTTP headers and unauthorized cross-origin requests.
+
+### 9. Secure Configuration
+Sensitive configuration values are stored using environment variables rather than being hard-coded in the source code.
+Sensitive values include:
+* MongoDB connection details
+* Asgardeo Client ID
+* Asgardeo Client Secret
+* Cloudinary API credentials
+
+Environment files containing secrets are excluded from the public GitHub repository.
+
+### 10. OWASP Top 10 Security Considerations
+Security controls were implemented to address relevant OWASP Top 10 risks within the application.
+These include:
+* **Broken Access Control** — RBAC and server-side resource ownership verification
+* **Cryptographic Failures / Sensitive Data Exposure** — sensitive credentials are stored in environment variables rather than source code
+* **Injection** — input validation and MongoDB ObjectId validation
+* **Identification and Authentication Failures** — OIDC authentication and access-token validation
+* **Security Misconfiguration** — Helmet, restricted CORS, and secure configuration management
+* **Software and Data Integrity Failures** — authenticated and authorized API operations
+* **Security Logging and Error Handling** — controlled error responses and production error-message sanitization
+
+Only the OWASP risks relevant to the application's implemented functionality were considered.
+
+---
+
+## 🛠️ Technologies Used
+
+| Category | Technologies |
+| :--- | :--- |
+| **Frontend** | React.js, Vite, React Router, Axios, CSS |
+| **Backend** | Node.js, Express.js, Mongoose |
+| **Database** | MongoDB, MongoDB Atlas / Local MongoDB |
+| **Authentication & Security** | Asgardeo, OpenID Connect (OIDC), JWT, Role-Based Access Control, Helmet, CORS, Multer |
+| **Image Storage** | Cloudinary |
+
+---
+
+## 📁 Project Structure
+
+```text
+dev-canvas/
+│
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── ...
+│   │
+│   ├── scripts/
+│   ├── package.json
+│   └── ...
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+│
+├── docs/
+│   ├── ASGARDEO_SETUP.md
+│   └── SECURITY.md
+│
+└── README.md
+```
+
+---
+
+## 🚀 Setup and Installation
+
+Follow the steps below to run DevCanvas locally.
 
 ### Prerequisites
-- Node.js (v18 or v20+)
-- MongoDB database (Local or MongoDB Atlas)
-- Asgardeo Account & OIDC Application (See [docs/ASGARDEO_SETUP.md](docs/ASGARDEO_SETUP.md))
-- Cloudinary Account (for project image CDN)
+Make sure the following are installed:
+* Node.js 18 or later
+* npm
+* MongoDB or a MongoDB Atlas account
 
-### 1. Installation
+You will also need:
+* An Asgardeo account
+* A Cloudinary account
+
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/Pabodha-Wann/dev-canvas.git
 cd dev-canvas
+```
 
-# Install backend dependencies
+### 2. Install Backend Dependencies
+Navigate to the backend directory:
+```bash
 cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
 npm install
 ```
 
-### 2. Environment Configuration
+### 3. Install Frontend Dependencies
+Open a new terminal and navigate to the frontend directory:
+```bash
+cd frontend
+npm install
+```
 
-Create `.env` in the **backend** folder:
+---
+
+## 🗄️ Database Configuration
+
+DevCanvas uses MongoDB for storing application data.
+You can use either a local MongoDB installation or MongoDB Atlas.
+
+### Local MongoDB
+Make sure MongoDB is running locally and configure:
+```env
+MONGODB_URI=mongodb://localhost:27017/devcanvas
+```
+
+### MongoDB Atlas
+Create a MongoDB Atlas cluster and obtain the connection string.
+Example:
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/devcanvas
+```
+Replace the placeholders with your own credentials.
+
+---
+
+## 🔑 Environment Configuration
+
+Sensitive configuration values are not included in this public repository.
+
+### Backend Environment Variables
+Inside the backend directory, create a file named:
+```text
+.env
+```
+Add the required configuration:
 ```env
 PORT=3000
-MONGODB_URI=mongodb://localhost:27017/devcanvas
+
+MONGODB_URI=your_mongodb_connection_string
+
 CLIENT_URL=http://localhost:5173
 SERVER_URL=http://localhost:3000
-JWT_SECRET=your_super_secret_jwt_key
+
 NODE_ENV=development
 
-# Asgardeo OIDC Credentials
-ASGARDEO_CLIENT_ID=your_asgardeo_client_id
-ASGARDEO_CLIENT_SECRET=your_asgardeo_client_secret
+# Asgardeo OIDC
+ASGARDEO_CLIENT_ID=your_client_id
+ASGARDEO_CLIENT_SECRET=your_client_secret
 ASGARDEO_TENANT=your_tenant_name
 ASGARDEO_BASE_URL=https://api.asgardeo.io/t/your_tenant_name
 ASGARDEO_ISSUER=https://api.asgardeo.io/t/your_tenant_name/oauth2/token
 ASGARDEO_REDIRECT_URI=http://localhost:3000/api/auth/asgardeo/callback
 ASGARDEO_SCOPES=openid profile email
 
-# Cloudinary CDN Credentials
+# Cloudinary
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
+Replace all placeholder values with your own configuration.
 
-Create `.env` in the **frontend** folder:
+### Frontend Environment Variables
+Inside the frontend directory, create:
+```text
+.env
+```
+Add:
 ```env
 VITE_API_URL=http://localhost:3000/api
 ```
 
 ---
 
-## 🗄️ Database Creation & Initialization Script
+## 🔐 Asgardeo Configuration
 
-To initialize MongoDB database indexes and collections locally:
+An Asgardeo OIDC application is required for authentication.
 
-```bash
-cd backend
-node -e "
-import mongoose from 'mongoose';
-import User from './src/models/User.js';
-import Project from './src/models/Project.js';
+1. **Create an OIDC Application**  
+   Create an OIDC application in your Asgardeo organization.
 
-async function initDB() {
-  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/devcanvas');
-  console.log('MongoDB Connected!');
-  await User.createIndexes();
-  await Project.createIndexes();
-  console.log('Database Indexes Created Successfully!');
-  process.exit(0);
-}
-initDB();
-"
-```
-
----
-
-## 🔒 Running with HTTPS Configuration
-
-### Development Mode (Local HTTPS)
-To run the Vite frontend and Express backend over HTTPS during development:
-1. Generate dev TLS certificates (e.g., using `mkcert`):
-   ```bash
-   mkcert -install
-   mkcert localhost
+2. **Configure the Callback URL**  
+   For local development, configure:
+   ```text
+   http://localhost:3000/api/auth/asgardeo/callback
    ```
-2. Place `localhost.pem` and `localhost-key.pem` in `backend/certs/`.
-3. Set `SERVER_URL=https://localhost:3000` and `CLIENT_URL=https://localhost:5173` in `.env`.
 
-### Production TLS Architecture
-In production, deploy the Express API behind an NGINX reverse proxy configured with Let's Encrypt TLS certificates:
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name devcanvas.example.com;
+3. **Configure the Required Scopes**  
+   Use:
+   ```text
+   openid profile email
+   ```
 
-    ssl_certificate /etc/letsencrypt/live/devcanvas.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/devcanvas.example.com/privkey.pem;
+4. **Configure Environment Variables**  
+   Add the Asgardeo configuration values to the backend `.env` file:
+   ```env
+   ASGARDEO_CLIENT_ID=your_client_id
+   ASGARDEO_CLIENT_SECRET=your_client_secret
+   ASGARDEO_TENANT=your_tenant_name
+   ```
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto https;
-    }
-}
-```
+Additional configuration details can be found in:
+* `docs/ASGARDEO_SETUP.md`
 
 ---
 
-## 🧪 Security & API Verification Testing
+## ☁️ Cloudinary Configuration
 
-Run the automated test suite to verify OWASP controls and endpoints:
+DevCanvas uses Cloudinary for storing project images.
 
+1. **Create a Cloudinary Account**  
+   Create a Cloudinary account and open the Cloudinary dashboard.
+
+2. **Obtain the Credentials**  
+   You will need:
+   * Cloud Name
+   * API Key
+   * API Secret
+
+3. **Add the Credentials**  
+   Add them to the backend `.env` file:
+   ```env
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   ```
+   *Do not commit the Cloudinary API Secret to GitHub.*
+
+---
+
+## ▶️ Running the Application
+
+The frontend and backend must be started separately.
+
+### 1. Start the Backend
+Open a terminal and run:
 ```bash
 cd backend
-node scripts/verify-security.js
+npm run dev
 ```
-
-### Test Evidence Output
+The backend runs on:
 ```text
-====================================================
-   DEVCANVAS ASSESSMENT 2 — SECURITY & API TESTS    
-====================================================
+http://localhost:3000
+```
+Keep this terminal running.
 
-[PASS] Backend Health Check (/api/health)
-[PASS] Unauthenticated POST /api/projects returns HTTP 401
-[PASS] Forged Bearer Token on /api/auth/me returns HTTP 401
-[PASS] Invalid ObjectId in URL parameter returns HTTP 400
-[PASS] Public GET /api/projects returns HTTP 200
-[PASS] Asgardeo OIDC Endpoint Configuration Validated
-[PASS] Database Schema: User.asgardeoId field present & indexed
-
-====================================================
- SUMMARY: 7 PASSED, 0 FAILED
-====================================================
+### 2. Start the Frontend
+Open a new terminal and run:
+```bash
+cd frontend
+npm run dev
+```
+The frontend runs on:
+```text
+http://localhost:5173
 ```
 
+### 3. Open the Application
+Open the following address in your browser:
+```text
+http://localhost:5173
+```
+The application should now be running.  
+You can test the authentication flow by logging in through Asgardeo.
+
 ---
 
-## 📁 Additional Documentation Links
+## 📚 Documentation
 
-- **Asgardeo Setup Guide**: [docs/ASGARDEO_SETUP.md](docs/ASGARDEO_SETUP.md)
-- **OWASP Top 10 Report**: [docs/SECURITY.md](docs/SECURITY.md)
+Additional documentation is available in the `docs` directory:
+* `docs/ASGARDEO_SETUP.md` — Asgardeo OIDC configuration
+* `docs/SECURITY.md` — Security implementation details
 
 ---
 
-## 👥 Authors
-Developed for Assessment 2: Secure Web Application Development.
+## 👤 Author
+
+**Dinuja Ranaweera**  
+SE/2022/026  
+
+DevCanvas was enhanced for the Information Security module assignment by improving the security of the existing Student Project Showcase Portal through OIDC authentication, access-token validation, role-based access control, resource ownership protection, input validation, secure file uploads, and secure configuration.
